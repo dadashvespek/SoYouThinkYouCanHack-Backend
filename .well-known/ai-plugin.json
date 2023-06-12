@@ -6,7 +6,7 @@
 	"description_for_model": "Use the Calculator plugin to perform basic arithmetic operations, including addition (+), subtraction (-), multiplication (*), division (/), power (^), and square root (√). Provide the numbers and the operation symbol in your query, and the plugin will return the calculated result.",
 	"api": {
 		"type": "openapi",
-		"url": "https://chat-calculator-plugin.supportmirage.repl.co/openapi.json",
+		"url": "https://scary-fashion-eel.cyclic.app/.well-known/openapi.json",
 		"is_user_authenticated": false
 	},
 	"auth": {
