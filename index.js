@@ -2,8 +2,30 @@ const express = require('express');
 const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
-const swaggerConfig = require('./swagger'); 
-swaggerConfig(app);
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+// Extended: https://swagger.io/specification/#infoObject
+const swaggerOptions = {
+    swaggerDefinition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Workout API',
+        version: '1.0.0',
+        description: 'This is a simple CRUD API application made with Express and documented with Swagger',
+      },
+      servers: [
+        {
+          url: 'http://localhost:5000',
+        },
+      ],
+    },
+    // ['.routes/*.js']
+    apis: ['index.js'], // files containing annotations as above
+  };
+  
+  const swaggerDocs = swaggerJsDoc(swaggerOptions);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Create a Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -11,7 +33,32 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANO
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// This route adds a new user to the database
+/**
+ * @openapi
+ * /addUser:
+ *   post:
+ *     description: This route adds a new user to the database
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *             example:
+ *               name: John Doe
+ *               email: john@doe.com
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
 app.post('/addUser', async (req, res) => {
   const userData = req.body; 
   const { data, error } = await supabase
@@ -307,11 +354,7 @@ app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) =>
     return res.status(200).json({ data });
   });
   
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, {
-    swaggerOptions: {
-      url: '/swagger.json',
-    },
-  }));
+
 
 const PORT = process.env.PORT || 5000;
 
