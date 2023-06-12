@@ -1,14 +1,14 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.0.1",
     "info": {
-      "title": "Workout API",
-      "version": "1.0.0"
+      "title": "Workout/Schedule/Profile reader/modifier Plugin",
+      "description": "A plugin for that allows users to create, read, update, and delete their workout schedules and profiles using the open-assistant chatbot",
+      "version": "v1"
     },
-    "tags": [
-        { "name": "Users" },
-        { "name": "Schedules" },
-        { "name": "Workout Plans" },
-        { "name": "Exercises" }
+    "servers": [
+      {
+        "url": "https://scary-fashion-eel.cyclic.app"
+      }
     ],
     "paths": {
       "/addUser": {
