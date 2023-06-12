@@ -52,6 +52,17 @@ app.post('/addUser', async (req, res) => {
 });
 
 
+//add user
+app.post('/addUser', async (req, res) => {
+    const userData = req.body;
+    const { data, error } = await supabase
+        .from('users')
+        .insert([
+            { ...userData }
+        ]);
+    if (error) return res.status(400).json({ error: error.message });
+    return res.status(200).json({ data });
+});
 
 
 app.get('/getUser/:userid', async (req, res) => {
