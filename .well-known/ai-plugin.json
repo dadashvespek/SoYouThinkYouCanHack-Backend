@@ -1,12 +1,12 @@
 {
 	"schema_version": "v1",
-	"name_for_human": "Schedule/Workout/Profile Planner/reader",
-	"name_for_model": "Schedule/Workout/Profile Planner/reader",
-	"description_for_human": "Plugin for reading and planning your schedule, workouts, and profile",
-	"description_for_model": "Use the Schedule/Workout/Profile Planner/reader plugin to read and plan user schedule, workouts, and profile",
+	"name_for_human": "Calculator Plugin",
+	"name_for_model": "calculator",
+	"description_for_human": "Plugin for basic arithmetic operations like addition, subtraction, multiplication, division, power, and square root.",
+	"description_for_model": "Use the Calculator plugin to perform basic arithmetic operations, including addition (+), subtraction (-), multiplication (*), division (/), power (^), and square root (√). Provide the numbers and the operation symbol in your query, and the plugin will return the calculated result.",
 	"api": {
 		"type": "openapi",
-		"url": "https://scary-fashion-eel.cyclic.app/.well-known/openapi.json",
+		"url": "https://chat-calculator-plugin.supportmirage.repl.co/openapi.json",
 		"is_user_authenticated": false
 	},
 	"auth": {
