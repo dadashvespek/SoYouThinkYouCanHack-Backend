@@ -38,32 +38,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANO
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/**
- * @openapi
- * /addUser:
- *   post:
- *     description: This route adds a new user to the database
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *             example:
- *               name: John Doe
- *               email: john@doe.com
- *     responses:
- *       '200':
- *         description: Successful operation
- *       '400':
- *         description: Error occurred
- */
+
 app.post('/addUser', async (req, res) => {
   const userData = req.body; 
   const { data, error } = await supabase
@@ -76,25 +51,7 @@ app.post('/addUser', async (req, res) => {
   return res.status(200).json({ data });
 });
 
-/**
- * @openapi
- * /getUser/{userid}:
- *   get:
- *     description: This route retrieves a user from the database based on their id
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: userid
- *         required: true
- *         description: The id of the user to retrieve
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Successful operation
- *       '400':
- *         description: Error occurred
- */
+
 
 
 app.get('/getUser/:userid', async (req, res) => {
@@ -965,6 +922,51 @@ app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) =>
  *         description: Error occurred
  */
 
+/**
+ * @openapi
+ * /addUser:
+ *   post:
+ *     description: This route adds a new user to the database
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *             example:
+ *               name: John Doe
+ *               email: john@doe.com
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+/**
+ * @openapi
+ * /getUser/{userid}:
+ *   get:
+ *     description: This route retrieves a user from the database based on their id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
 
 const PORT = process.env.PORT || 5000;
 
