@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
+const swaggerConfig = require('./swagger'); 
+swaggerConfig(app);
 // Create a Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -305,7 +307,11 @@ app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) =>
     return res.status(200).json({ data });
   });
   
-
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, {
+    swaggerOptions: {
+      url: '/swagger.json',
+    },
+  }));
 
 const PORT = process.env.PORT || 5000;
 
