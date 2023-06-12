@@ -1,63 +1,48 @@
 {
     "openapi": "3.0.1",
     "info": {
-      "title": "Calculator Plugin",
-      "description": "A plugin that allows the user to perform basic arithmetic operations like addition, subtraction, multiplication, division, power, and square root.",
+      "title": "User Management and Workout Plan",
+      "description": "API endpoints for user management and workout plan",
       "version": "v1"
     },
     "servers": [
       {
-        "url": "https://chat-calculator-plugin.supportmirage.repl.co"
+        "url": "https://your-api-url.example.com"
       }
     ],
     "paths": {
-      "/calculator/{operation}/{a}/{b}": {
-        "get": {
-          "operationId": "calculate",
-          "summary": "Perform a calculation",
-          "parameters": [
-            {
-              "in": "path",
-              "name": "operation",
-              "schema": {
-                "type": "string",
-                "enum": [
-                  "add",
-                  "subtract",
-                  "multiply",
-                  "divide",
-                  "power"
-                ]
-              },
-              "required": true,
-              "description": "The operation to perform."
+      "/addUser": {
+        "post": {
+          "operationId": "addUser",
+          "summary": "Add a new user",
+          "requestBody": {
+            "description": "User information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
             },
-            {
-              "in": "path",
-              "name": "a",
-              "schema": {
-                "type": "number"
-              },
-              "required": true,
-              "description": "The first operand."
-            },
-            {
-              "in": "path",
-              "name": "b",
-              "schema": {
-                "type": "number"
-              },
-              "required": true,
-              "description": "The second operand."
-            }
-          ],
+            "required": true
+          },
           "responses": {
             "200": {
               "description": "OK",
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/calculateResponse"
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
                   }
                 }
               }
@@ -65,19 +50,19 @@
           }
         }
       },
-      "/calculator/sqrt/{a}": {
+      "/getUser/{userid}": {
         "get": {
-          "operationId": "sqrt",
-          "summary": "Find the square root of a number",
+          "operationId": "getUser",
+          "summary": "Get a user by ID",
           "parameters": [
             {
               "in": "path",
-              "name": "a",
+              "name": "userid",
               "schema": {
-                "type": "number"
+                "type": "string"
               },
               "required": true,
-              "description": "The number to find the square root of."
+              "description": "User ID"
             }
           ],
           "responses": {
@@ -86,7 +71,67 @@
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/calculateResponse"
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/updateUser/{userid}": {
+        "put": {
+          "operationId": "updateUser",
+          "summary": "Update a user",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "User ID"
+            }
+          ],
+          "requestBody": {
+            "description": "Updated user information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Error"
                   }
                 }
               }
@@ -97,15 +142,45 @@
     },
     "components": {
       "schemas": {
-        "calculateResponse": {
+        "User": {
           "type": "object",
           "properties": {
-            "result": {
-              "type": "number",
-              "description": "The result of the calculation."
+            "userid": {
+              "type": "string",
+              "description": "User ID"
+            },
+            "name": {
+              "type": "string",
+              "description": "User name"
+            },
+            "email": {
+              "type": "string",
+              "description": "User email"
+            },
+            "password": {
+              "type": "string",
+              "description": "User password"
+            }
+          }
+        },
+        "UserResponse": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "string",
+              "description": "Error message"
             }
           }
         }
       }
     }
   }
+  
