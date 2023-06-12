@@ -4,6 +4,7 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const path = require('path');
 
 // Extended: https://swagger.io/specification/#infoObject
 const swaggerOptions = {
@@ -26,6 +27,10 @@ const swaggerOptions = {
   
   const swaggerDocs = swaggerJsDoc(swaggerOptions);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  
+// serve all static routes
+app.use(express.static(path.join(__dirname)));
+
 // Create a Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -62,7 +67,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/addUser', async (req, res) => {
   const userData = req.body; 
   const { data, error } = await supabase
-    .from('User')
+    .from('users')
     .insert([
       { ...userData }
     ]);
@@ -71,39 +76,70 @@ app.post('/addUser', async (req, res) => {
   return res.status(200).json({ data });
 });
 
+/**
+ * @openapi
+ * /getUser/{userid}:
+ *   get:
+ *     description: This route retrieves a user from the database based on their id
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+
+app.get('/getUser/:userid', async (req, res) => {
+    const userid = req.params.userid;
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('userid', userid);
+    if (error) return res.status(400).json({ error: error.message });
+    return res.status(200).json({ data });
+});
+
 // This route updates an existing user in the database
-app.put('/updateUser/:userID', async (req, res) => {
-  const userID = req.params.userID;
+app.put('/updateUser/:userid', async (req, res) => {
+  const userid = req.params.userid;
   const updatedFields = req.body;
   const { data, error } = await supabase
-    .from('User')
+    .from('users')
     .update(updatedFields)
-    .match({ userID });
+    .match({ userid });
 
   if (error) return res.status(400).json({ error: error.message });
   return res.status(200).json({ data });
 });
 
 // This route deletes a user from the database
-app.delete('/deleteUser/:userID', async (req, res) => {
-  const userID = req.params.userID;
+app.delete('/deleteUser/:userid', async (req, res) => {
+  const userid = req.params.userid;
   const { data, error } = await supabase
-    .from('User')
+    .from('users')
     .delete()
-    .match({ userID });
+    .match({ userid });
 
   if (error) return res.status(400).json({ error: error.message });
   return res.status(200).json({ data });
 });
 
 // This route adds a new schedule to the database for a specific user
-app.post('/addSchedule/:userID', async (req, res) => {
-    const userID = req.params.userID;
+app.post('/addSchedule/:userid', async (req, res) => {
+    const userid = req.params.userid;
     const scheduleData = req.body;
     const { data, error } = await supabase
-      .from('Schedule')
+      .from('schedules')
       .insert([
-        { userID, ...scheduleData }
+        { userid, ...scheduleData }
       ]);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -111,56 +147,56 @@ app.post('/addSchedule/:userID', async (req, res) => {
   });
   
   // This route updates an existing schedule in the database for a specific user
-  app.put('/updateSchedule/:userID/:scheduleID', async (req, res) => {
-    const userID = req.params.userID;
-    const scheduleID = req.params.scheduleID;
+  app.put('/updateSchedule/:userid/:scheduleid', async (req, res) => {
+    const userid = req.params.userid;
+    const scheduleid = req.params.scheduleid;
     const updatedFields = req.body;
     const { data, error } = await supabase
-      .from('Schedule')
+      .from('schedules')
       .update(updatedFields)
-      .eq('userID', userID)
-      .eq('scheduleID', scheduleID);
+      .eq('userid', userid)
+      .eq('scheduleid', scheduleid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route deletes a schedule from the database for a specific user
-  app.delete('/deleteSchedule/:userID/:scheduleID', async (req, res) => {
-    const userID = req.params.userID;
-    const scheduleID = req.params.scheduleID;
+  app.delete('/deleteSchedule/:userid/:scheduleid', async (req, res) => {
+    const userid = req.params.userid;
+    const scheduleid = req.params.scheduleid;
     const { data, error } = await supabase
-      .from('Schedule')
+      .from('schedules')
       .delete()
-      .eq('userID', userID)
-      .eq('scheduleID', scheduleID);
+      .eq('userid', userid)
+      .eq('scheduleid', scheduleid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
-  // This route retrieves a schedule entry from the database based on its ID for a specific user
-  app.get('/getSchedule/:userID/:scheduleID', async (req, res) => {
-    const userID = req.params.userID;
-    const scheduleID = req.params.scheduleID;
+  // This route retrieves a schedule entry from the database based on its id for a specific user
+  app.get('/getSchedule/:userid/:scheduleid', async (req, res) => {
+    const userid = req.params.userid;
+    const scheduleid = req.params.scheduleid;
     const { data, error } = await supabase
-      .from('Schedule')
+      .from('schedules')
       .select()
-      .eq('userID', userID)
-      .eq('scheduleID', scheduleID);
+      .eq('userid', userid)
+      .eq('scheduleid', scheduleid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route retrieves schedule entries based on specified query parameters for a specific user
-  app.get('/getSchedules/:userID', async (req, res) => {
-    const userID = req.params.userID;
+  app.get('/getSchedules/:userid', async (req, res) => {
+    const userid = req.params.userid;
     const queryParams = req.query;
     const { data, error } = await supabase
-      .from('Schedule')
+      .from('schedules')
       .select()
-      .eq('userID', userID)
+      .eq('userid', userid)
       .match(queryParams);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -168,49 +204,49 @@ app.post('/addSchedule/:userID', async (req, res) => {
   });
   
 // This route retrieves the details of a specific workout plan
-app.get('/getWorkoutPlan/:workoutID', async (req, res) => {
-    const workoutID = req.params.workoutID;
+app.get('/getWorkoutPlan/:workoutid', async (req, res) => {
+    const workoutid = req.params.workoutid;
     const { data, error } = await supabase
-      .from('WorkoutPlan')
+      .from('workoutplans')
       .select()
-      .eq('workoutID', workoutID);
+      .eq('workoutid', workoutid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route updates the name of a specific workout plan
-  app.put('/updateWorkoutPlan/:workoutID', async (req, res) => {
-    const workoutID = req.params.workoutID;
+  app.put('/updateWorkoutPlan/:workoutid', async (req, res) => {
+    const workoutid = req.params.workoutid;
     const { workoutName } = req.body;
     const { data, error } = await supabase
-      .from('WorkoutPlan')
+      .from('workoutplans')
       .update({ workoutName })
-      .eq('workoutID', workoutID);
+      .eq('workoutid', workoutid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route deletes a specific workout plan
-  app.delete('/deleteWorkoutPlan/:workoutID', async (req, res) => {
-    const workoutID = req.params.workoutID;
+  app.delete('/deleteWorkoutPlan/:workoutid', async (req, res) => {
+    const workoutid = req.params.workoutid;
     const { data, error } = await supabase
-      .from('WorkoutPlan')
+      .from('workoutplans')
       .delete()
-      .eq('workoutID', workoutID);
+      .eq('workoutid', workoutid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route retrieves all workout plans for a specific user
-  app.get('/getUserWorkoutPlans/:userID', async (req, res) => {
-    const userID = req.params.userID;
+  app.get('/getUserWorkoutPlans/:userid', async (req, res) => {
+    const userid = req.params.userid;
     const { data, error } = await supabase
-      .from('WorkoutPlan')
+      .from('workoutplans')
       .select()
-      .eq('userID', userID);
+      .eq('userid', userid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
@@ -220,7 +256,7 @@ app.get('/getWorkoutPlan/:workoutID', async (req, res) => {
   app.post('/addExercise', async (req, res) => {
     const { exerciseName, reps, sets } = req.body;
     const { data, error } = await supabase
-      .from('Exercise')
+      .from('exercises')
       .insert([{ exerciseName, reps, sets }]);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -228,37 +264,37 @@ app.get('/getWorkoutPlan/:workoutID', async (req, res) => {
   });
   
   // This route retrieves the details of a specific exercise
-  app.get('/getExercise/:exerciseID', async (req, res) => {
-    const exerciseID = req.params.exerciseID;
+  app.get('/getExercise/:exerciseid', async (req, res) => {
+    const exerciseid = req.params.exerciseid;
     const { data, error } = await supabase
-      .from('Exercise')
+      .from('exercises')
       .select()
-      .eq('exerciseID', exerciseID);
+      .eq('exerciseid', exerciseid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route updates the details of a specific exercise
-  app.put('/updateExercise/:exerciseID', async (req, res) => {
-    const exerciseID = req.params.exerciseID;
+  app.put('/updateExercise/:exerciseid', async (req, res) => {
+    const exerciseid = req.params.exerciseid;
     const { exerciseName, reps, sets } = req.body;
     const { data, error } = await supabase
-    .from('Exercise')
+    .from('exercises')
     .update({ exerciseName, reps, sets })
-    .eq('exerciseID', exerciseID);
+    .eq('exerciseid', exerciseid);
 
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
     });
 
     // This route deletes a specific exercise
-    app.delete('/deleteExercise/:exerciseID', async (req, res) => {
-        const exerciseID = req.params.exerciseID;
+    app.delete('/deleteExercise/:exerciseid', async (req, res) => {
+        const exerciseid = req.params.exerciseid;
         const { data, error } = await supabase
-        .from('Exercise')
+        .from('exercises')
         .delete()
-        .eq('exerciseID', exerciseID);
+        .eq('exerciseid', exerciseid);
 
         if (error) return res.status(400).json({ error: error.message });
         return res.status(200).json({ data });
@@ -267,7 +303,7 @@ app.get('/getWorkoutPlan/:workoutID', async (req, res) => {
     // This route retrieves all exercises
     app.get('/getExercises', async (req, res) => {
         const { data, error } = await supabase
-        .from('Exercise')
+        .from('exercises')
         .select();
 
         if (error) return res.status(400).json({ error: error.message });
@@ -276,12 +312,12 @@ app.get('/getWorkoutPlan/:workoutID', async (req, res) => {
 
 
 // This route adds an exercise to a workout plan
-app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) => {
-    const { workoutID, exerciseID } = req.params;
+app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) => {
+    const { workoutid, exerciseid } = req.params;
     const { data, error } = await supabase
-      .from('WorkoutPlanExercises')
+      .from('workoutplanexercises')
       .insert([
-        { workoutID, exerciseID }
+        { workoutid, exerciseid }
       ]);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -289,25 +325,25 @@ app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) =>
   });
   
   // This route removes an exercise from a workout plan
-  app.delete('/removeExerciseFromWorkoutPlan/:workoutID/:exerciseID', async (req, res) => {
-    const { workoutID, exerciseID } = req.params;
+  app.delete('/removeExerciseFromWorkoutPlan/:workoutid/:exerciseid', async (req, res) => {
+    const { workoutid, exerciseid } = req.params;
     const { data, error } = await supabase
-      .from('WorkoutPlanExercises')
+      .from('workoutplanexercises')
       .delete()
-      .eq('workoutID', workoutID)
-      .eq('exerciseID', exerciseID);
+      .eq('workoutid', workoutid)
+      .eq('exerciseid', exerciseid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route adds a workout plan to a schedule
-  app.post('/addWorkoutPlanToSchedule/:scheduleID/:workoutID', async (req, res) => {
-    const { scheduleID, workoutID } = req.params;
+  app.post('/addWorkoutPlanToSchedule/:scheduleid/:workoutid', async (req, res) => {
+    const { scheduleid, workoutid } = req.params;
     const { data, error } = await supabase
-      .from('WorkoutSchedule')
+      .from('workoutschedules')
       .insert([
-        { scheduleID, workoutID }
+        { scheduleid, workoutid }
       ]);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -315,26 +351,26 @@ app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) =>
   });
   
   // This route removes a workout plan from a schedule
-  app.delete('/removeWorkoutPlanFromSchedule/:scheduleID/:workoutID', async (req, res) => {
-    const { scheduleID, workoutID } = req.params;
+  app.delete('/removeWorkoutPlanFromSchedule/:scheduleid/:workoutid', async (req, res) => {
+    const { scheduleid, workoutid } = req.params;
     const { data, error } = await supabase
-      .from('WorkoutSchedule')
+      .from('workoutschedules')
       .delete()
-      .eq('scheduleID', scheduleID)
-      .eq('workoutID', workoutID);
+      .eq('scheduleid', scheduleid)
+      .eq('workoutid', workoutid);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
   // This route marks a workout plan as completed for a user
-  app.post('/completeWorkout/:userID/:workoutID', async (req, res) => {
-    const { userID, workoutID } = req.params;
+  app.post('/completeWorkout/:userid/:workoutid', async (req, res) => {
+    const { userid, workoutid } = req.params;
     const { completionDate, completionTime } = req.body; // assume client passes these values in the request body
     const { data, error } = await supabase
-      .from('WorkoutCompletion')
+      .from('workoutcompletions')
       .insert([
-        { userID, workoutID, completionDate, completionTime, workoutDone: true }
+        { userid, workoutid, completionDate, completionTime, workoutDone: true }
       ]);
   
     if (error) return res.status(400).json({ error: error.message });
@@ -342,18 +378,592 @@ app.post('/addExerciseToWorkoutPlan/:workoutID/:exerciseID', async (req, res) =>
   });
   
   // This route gets all completed workouts for a user
-  app.get('/getCompletedWorkouts/:userID', async (req, res) => {
-    const { userID } = req.params;
+  app.get('/getCompletedWorkouts/:userid', async (req, res) => {
+    const { userid } = req.params;
     const { data, error } = await supabase
-      .from('WorkoutCompletion')
+      .from('workoutcompletions')
       .select()
-      .eq('userID', userID)
-      .eq('workoutDone', true);
+      .eq('userid', userid)
+      .eq('workoutdone', true);
   
     if (error) return res.status(400).json({ error: error.message });
     return res.status(200).json({ data });
   });
   
+/**
+ * @openapi
+ * /updateUser/{userid}:
+ *   put:
+ *     description: This route updates an existing user in the database
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *             example:
+ *               name: John Doe
+ *               email: john@doe.com
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /deleteUser/{userid}:
+ *   delete:
+ *     description: This route deletes a user from the database
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /addSchedule/{userid}:
+ *   post:
+ *     description: This route adds a new schedule to the database for a specific user
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user to add the schedule to
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               scheduleData:
+ *                 type: object
+ *             example:
+ *               scheduleData:
+ *                 day: Monday
+ *                 time: 09:00 AM
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /updateSchedule/{userid}/{scheduleid}:
+ *   put:
+ *     description: This route updates an existing schedule in the database for a specific user
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who owns the schedule
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: scheduleid
+ *         required: true
+ *         description: The id of the schedule to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               updatedFields:
+ *                 type: object
+ *             example:
+ *               updatedFields:
+ *                 day: Tuesday
+ *                 time: 10:00 AM
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /deleteSchedule/{userid}/{scheduleid}:
+ *   delete:
+ *     description: This route deletes a schedule from the database for a specific user
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who owns the schedule
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: scheduleid
+ *         required: true
+ *         description: The id of the schedule to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getSchedule/{userid}/{scheduleid}:
+ *   get:
+ *     description: This route retrieves a schedule entry from the database based on its id for a specific user
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who owns the schedule
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: scheduleid
+ *         required: true
+ *         description: The id of the schedule to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getSchedules/{userid}:
+ *   get:
+ *     description: This route retrieves schedule entries based on specified query parameters for a specific user
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who owns the schedules
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getWorkoutPlan/{workoutid}:
+ *   get:
+ *     description: This route retrieves the details of a specific workout plan
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /updateWorkoutPlan/{workoutid}:
+ *   put:
+ *     description: This route updates the name of a specific workout plan
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               workoutName:
+ *                 type: string
+ *             example:
+ *               workoutName: New Workout Plan
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /deleteWorkoutPlan/{workoutid}:
+ *   delete:
+ *     description: This route deletes a specific workout plan
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getUserWorkoutPlans/{userid}:
+ *   get:
+ *     description: This route retrieves all workout plans for a specific user
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who owns the workout plans
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /addExercise:
+ *   post:
+ *     description: This route adds a new exercise to the Exercise table
+ *     tags: [Exercises]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               exerciseName:
+ *                 type: string
+ *               reps:
+ *                 type: number
+ *               sets:
+ *                 type: number
+ *             example:
+ *               exerciseName: Squats
+ *               reps: 10
+ *               sets: 3
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getExercise/{exerciseid}:
+ *   get:
+ *     description: This route retrieves the details of a specific exercise
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: exerciseid
+ *         required: true
+ *         description: The id of the exercise to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /updateExercise/{exerciseid}:
+ *   put:
+ *     description: This route updates the details of a specific exercise
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: exerciseid
+ *         required: true
+ *         description: The id of the exercise to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               exerciseName:
+ *                 type: string
+ *               reps:
+ *                 type: number
+ *               sets:
+ *                 type: number
+ *             example:
+ *               exerciseName: Squats
+ *               reps: 12
+ *               sets: 4
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /deleteExercise/{exerciseid}:
+ *   delete:
+ *     description: This route deletes a specific exercise
+ *     tags: [Exercises]
+ *     parameters:
+ *       - in: path
+ *         name: exerciseid
+ *         required: true
+ *         description: The id of the exercise to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getExercises:
+ *   get:
+ *     description: This route retrieves all exercises
+ *     tags: [Exercises]
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /addExerciseToWorkoutPlan/{workoutid}/{exerciseid}:
+ *   post:
+ *     description: This route adds an exercise to a workout plan
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to add the exercise to
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: exerciseid
+ *         required: true
+ *         description: The id of the exercise to add to the workout plan
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /removeExerciseFromWorkoutPlan/{workoutid}/{exerciseid}:
+ *   delete:
+ *     description: This route removes an exercise from a workout plan
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to remove the exercise from
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: exerciseid
+ *         required: true
+ *         description: The id of the exercise to remove from the workout plan
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /addWorkoutPlanToSchedule/{scheduleid}/{workoutid}:
+ *   post:
+ *     description: This route adds a workout plan to a schedule
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: scheduleid
+ *         required: true
+ *         description: The id of the schedule to add the workout plan to
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to add to the schedule
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}:
+ *   delete:
+ *     description: This route removes a workout plan from a schedule
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: scheduleid
+ *         required: true
+ *         description: The id of the schedule to remove the workout plan from
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to remove from the schedule
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /completeWorkout/{userid}/{workoutid}:
+ *   post:
+ *     description: This route marks a workout plan as completed for a user
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who completed the workout plan
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: workoutid
+ *         required: true
+ *         description: The id of the workout plan to mark as completed
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               completionDate:
+ *                 type: string
+ *                 format: date
+ *               completionTime:
+ *                 type: string
+ *                 format: time
+ *             example:
+ *               completionDate: 2023-06-12
+ *               completionTime: 09:30 AM
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
+
+/**
+ * @openapi
+ * /getCompletedWorkouts/{userid}:
+ *   get:
+ *     description: This route gets all completed workouts for a user
+ *     tags: [Workout Plans]
+ *     parameters:
+ *       - in: path
+ *         name: userid
+ *         required: true
+ *         description: The id of the user who completed the workouts
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Successful operation
+ *       '400':
+ *         description: Error occurred
+ */
 
 
 const PORT = process.env.PORT || 5000;

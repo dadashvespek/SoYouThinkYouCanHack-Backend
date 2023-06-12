@@ -1,271 +1,553 @@
 {
     "openapi": "3.0.0",
     "info": {
-      "title": "Workout Scheduler API",
+      "title": "Workout API",
       "version": "1.0.0"
     },
-    "servers": [
-        {
-          "url": "http://localhost:5000",
-          "description": "Local server"
-        }
-      ],
+    "tags": [
+        { "name": "Users" },
+        { "name": "Schedules" },
+        { "name": "Workout Plans" },
+        { "name": "Exercises" }
+    ],
     "paths": {
       "/addUser": {
         "post": {
+          "tags": ["Users"],
           "summary": "Adds a new user",
-          "operationId": "addUser",
+          "description": "This route adds a new user to the database",
           "requestBody": {
-            "description": "User data to add",
             "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "name": "John Doe",
+                  "email": "john@doe.com"
                 }
               }
             }
           },
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/updateUser/{userID}": {
+      "/getUser/{userid}": {
+        "get": {
+          "tags": ["Users"],
+          "summary": "Retrieve a user",
+          "description": "This route retrieves a user from the database based on their id",
+          "parameters": [{
+            "in": "path",
+            "name": "userid",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "The id of the user to retrieve"
+          }],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/updateUser/{userid}": {
         "put": {
-          "summary": "Updates an existing user",
-          "operationId": "updateUser",
-          "parameters": [
-            {
-              "name": "userID",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
+          "tags": ["Users"],
+          "summary": "Update an existing user",
+          "description": "This route updates an existing user in the database",
+          "parameters": [{
+            "in": "path",
+            "name": "userid",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "The id of the user to update"
+          }],
           "requestBody": {
-            "description": "User data to update",
             "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "name": "John Doe",
+                  "email": "john@doe.com"
                 }
               }
             }
           },
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/deleteUser/{userID}": {
+      "/deleteUser/{userid}": {
         "delete": {
-          "summary": "Deletes an existing user",
-          "operationId": "deleteUser",
-          "parameters": [
-            {
-              "name": "userID",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
+          "tags": ["Users"],
+          "summary": "Delete a user",
+          "description": "This route deletes a user from the database",
+          "parameters": [{
+            "in": "path",
+            "name": "userid",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "The id of the user to delete"
+          }],
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Response"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/addSchedule/{userID}": {
+      "/addSchedule/{userid}": {
         "post": {
-          "summary": "Adds a new schedule for a user",
-          "operationId": "addSchedule",
+            "description": "This route adds a new schedule to the database for a specific user",
+            "tags": ["Schedules"],
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "userid",
+                    "required": true,
+                    "description": "The id of the user to add the schedule to",
+                    "schema": { "type": "string" }
+                }
+            ],
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "scheduleData": { "type": "object" }
+                            },
+                            "example": {
+                                "scheduleData": {
+                                    "day": "Monday",
+                                    "time": "09:00 AM"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "200": { "description": "Successful operation" },
+                "400": { "description": "Error occurred" }
+            }
+        }
+    },
+    "/updateSchedule/{userid}/{scheduleid}": {
+        "put": {
+            "description": "This route updates an existing schedule in the database for a specific user",
+            "tags": ["Schedules"],
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "userid",
+                    "required": true,
+                    "description": "The id of the user who owns the schedule",
+                    "schema": { "type": "string" }
+                },
+                {
+                    "in": "path",
+                    "name": "scheduleid",
+                    "required": true,
+                    "description": "The id of the schedule to update",
+                    "schema": { "type": "string" }
+                }
+            ],
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "updatedFields": { "type": "object" }
+                            },
+                            "example": {
+                                "updatedFields": {
+                                    "day": "Tuesday",
+                                    "time": "10:00 AM"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "200": { "description": "Successful operation" },
+                "400": { "description": "Error occurred" }
+            }
+        }
+    },
+    "/deleteSchedule/{userid}/{scheduleid}": {
+        "delete": {
+          "description": "This route deletes a schedule from the database for a specific user",
+          "tags": ["Schedules"],
           "parameters": [
             {
-              "name": "userID",
               "in": "path",
+              "name": "userid",
               "required": true,
+              "description": "The id of the user who owns the schedule",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "required": true,
+              "description": "The id of the schedule to delete",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/getSchedule/{userid}/{scheduleid}": {
+        "get": {
+          "description": "This route retrieves a schedule entry from the database based on its id for a specific user",
+          "tags": ["Schedules"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "required": true,
+              "description": "The id of the user who owns the schedule",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "required": true,
+              "description": "The id of the schedule to retrieve",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/getSchedules/{userid}": {
+        "get": {
+          "description": "This route retrieves schedule entries based on specified query parameters for a specific user",
+          "tags": ["Schedules"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "required": true,
+              "description": "The id of the user who owns the schedules",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/getWorkoutPlan/{workoutid}": {
+        "get": {
+          "description": "This route retrieves the details of a specific workout plan",
+          "tags": ["Workout Plans"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to retrieve",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/updateWorkoutPlan/{workoutid}": {
+        "put": {
+          "description": "This route updates the name of a specific workout plan",
+          "tags": ["Workout Plans"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to update",
               "schema": {
                 "type": "string"
               }
             }
           ],
           "requestBody": {
-            "description": "Schedule data to add",
             "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schedule"
+                  "type": "object",
+                  "properties": {
+                    "workoutName": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "workoutName": "New Workout Plan"
+                  }
                 }
               }
             }
           },
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Schedule"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/updateSchedule/{userID}/{scheduleID}": {
-        "put": {
-          "tags": ["Schedule"],
-          "summary": "Updates an existing schedule for a specific user",
-          "description": "Updates the schedule with the specified ID for the user with the specified ID",
-          "operationId": "updateSchedule",
+      "/deleteWorkoutPlan/{workoutid}": {
+        "delete": {
+          "description": "This route deletes a specific workout plan",
+          "tags": ["Workout Plans"],
           "parameters": [
             {
-              "name": "userID",
               "in": "path",
-              "description": "Unique ID of the user",
+              "name": "workoutid",
               "required": true,
+              "description": "The id of the workout plan to delete",
               "schema": {
                 "type": "string"
               }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
             },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/getUserWorkoutPlans/{userid}": {
+        "get": {
+          "description": "This route retrieves all workout plans for a specific user",
+          "tags": ["Workout Plans"],
+          "parameters": [
             {
-              "name": "scheduleID",
               "in": "path",
-              "description": "Unique ID of the schedule to be updated",
+              "name": "userid",
               "required": true,
+              "description": "The id of the user who owns the workout plans",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/addExercise": {
+        "post": {
+          "description": "This route adds a new exercise to the Exercise table",
+          "tags": ["Exercises"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exerciseName": {
+                      "type": "string"
+                    },
+                    "reps": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "type": "number"
+                    }
+                  },
+                  "example": {
+                    "exerciseName": "Squats",
+                    "reps": 10,
+                    "sets": 3
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/getExercise/{exerciseid}": {
+        "get": {
+          "description": "This route retrieves the details of a specific exercise",
+          "tags": ["Exercises"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "exerciseid",
+              "required": true,
+              "description": "The id of the exercise to retrieve",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/updateExercise/{exerciseid}": {
+        "put": {
+          "description": "This route updates the details of a specific exercise",
+          "tags": ["Exercises"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "exerciseid",
+              "required": true,
+              "description": "The id of the exercise to update",
               "schema": {
                 "type": "string"
               }
             }
           ],
           "requestBody": {
+            "required": true,
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schedule"
+                  "type": "object",
+                  "properties": {
+                    "exerciseName": {
+                      "type": "string"
+                    },
+                    "reps": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "type": "number"
+                    }
+                  },
+                  "example": {
+                    "exerciseName": "Squats",
+                    "reps": 12,
+                    "sets": 4
+                  }
                 }
               }
             }
           },
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Response"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Invalid input",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/deleteSchedule/{userID}/{scheduleID}": {
+      "/deleteExercise/{exerciseid}": {
         "delete": {
-          "tags": ["Schedule"],
-          "summary": "Deletes a schedule from the database for a specific user",
-          "description": "Deletes the schedule with the specified ID for the user with the specified ID",
-          "operationId": "deleteSchedule",
+          "description": "This route deletes a specific exercise",
+          "tags": ["Exercises"],
           "parameters": [
             {
-              "name": "userID",
               "in": "path",
-              "description": "Unique ID of the user",
+              "name": "exerciseid",
               "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleID",
-              "in": "path",
-              "description": "Unique ID of the schedule to be deleted",
-              "required": true,
+              "description": "The id of the exercise to delete",
               "schema": {
                 "type": "string"
               }
@@ -273,84 +555,47 @@
           ],
           "responses": {
             "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Response"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Invalid input",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/getSchedule/{userID}/{scheduleID}": {
+      "/getExercises": {
         "get": {
-          "summary": "Retrieve a schedule based on its ID for a specific user",
-          "parameters": [
-            {
-              "name": "userID",
-              "in": "path",
-              "required": true,
-              "description": "ID of the user",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleID",
-              "in": "path",
-              "required": true,
-              "description": "ID of the schedule",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
+          "description": "This route retrieves all exercises",
+          "tags": ["Exercises"],
           "responses": {
             "200": {
-              "description": "The requested schedule",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ScheduleResponse"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
+              "description": "Error occurred"
             }
           }
         }
       },
-      "/getSchedules/{userID}": {
-        "get": {
-          "summary": "Retrieve schedule entries based on the user ID",
+      "/addExerciseToWorkoutPlan/{workoutid}/{exerciseid}": {
+        "post": {
+          "description": "This route adds an exercise to a workout plan",
+          "tags": ["Workout Plans"],
           "parameters": [
             {
-              "name": "userID",
               "in": "path",
+              "name": "workoutid",
               "required": true,
-              "description": "ID of the user",
+              "description": "The id of the workout plan to add the exercise to",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "exerciseid",
+              "required": true,
+              "description": "The id of the exercise to add to the workout plan",
               "schema": {
                 "type": "string"
               }
@@ -358,275 +603,173 @@
           ],
           "responses": {
             "200": {
-              "description": "List of the requested schedules",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/SchedulesResponse"
-                  }
-                }
-              }
+              "description": "Successful operation"
             },
             "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/removeExerciseFromWorkoutPlan/{workoutid}/{exerciseid}": {
+        "delete": {
+          "description": "This route removes an exercise from a workout plan",
+          "tags": ["Workout Plans"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to remove the exercise from",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "exerciseid",
+              "required": true,
+              "description": "The id of the exercise to remove from the workout plan",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/addWorkoutPlanToSchedule/{scheduleid}/{workoutid}": {
+        "post": {
+          "description": "This route adds a workout plan to a schedule",
+          "tags": ["Schedules"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "required": true,
+              "description": "The id of the schedule to add the workout plan to",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to add to the schedule",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}": {
+        "delete": {
+          "description": "This route removes a workout plan from a schedule",
+          "tags": ["Schedules"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "required": true,
+              "description": "The id of the schedule to remove the workout plan from",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to remove from the schedule",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
+            }
+          }
+        }
+      },
+      "/completeWorkout/{userid}/{workoutid}": {
+        "post": {
+          "description": "This route marks a workout plan as completed for a user",
+          "tags": ["Workout Plans"],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "required": true,
+              "description": "The id of the user who completed the workout plan",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "workoutid",
+              "required": true,
+              "description": "The id of the workout plan to mark as completed",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completionDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "completionTime": {
+                      "type": "string",
+                      "format": "time"
+                    }
+                  },
+                  "example": {
+                    "completionDate": "2023-06-12",
+                    "completionTime": "09:30 AM"
                   }
                 }
               }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation"
+            },
+            "400": {
+              "description": "Error occurred"
             }
           }
         }
       }
-    },
-    "/getSchedule/{userID}/{scheduleID}": {
-        "get": {
-          "summary": "Retrieve a schedule entry based on its ID for a specific user",
-          "parameters": [
-            {
-              "name": "userID",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleID",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Response"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/getSchedules/{userID}": {
-        "get": {
-          "summary": "Retrieve schedule entries based on specified query parameters for a specific user",
-          "parameters": [
-            {
-              "name": "userID",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful operation",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Response"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },  "/getWorkoutPlan/{workoutID}": {
-        "get": {
-          "summary": "Retrieve a specific workout plan by its ID",
-          "parameters": [
-            {
-              "name": "workoutID",
-              "in": "path",
-              "required": true,
-              "description": "Unique ID of the workout plan to retrieve",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Workout plan retrieved successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ResponseWorkoutPlan"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/updateWorkoutPlan/{workoutID}": {
-        "put": {
-          "summary": "Update a specific workout plan by its ID",
-          "parameters": [
-            {
-              "name": "workoutID",
-              "in": "path",
-              "required": true,
-              "description": "Unique ID of the workout plan to update",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkoutPlan"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Workout plan updated successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ResponseWorkoutPlan"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Error occurred",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },    
-"components": {
-    "schemas": {
-        "User": {
-            "type": "object",
-            "properties": {
-                "userID": {"type": "string"},
-                "name": {"type": "string"},
-                "email": {"type": "string"},
-                "password": {"type": "string"}
-            },
-            "required": ["userID", "name", "email", "password"]
-        },
-        "Schedule": {
-            "type": "object",
-            "properties": {
-                "scheduleID": {"type": "string"},
-                "userID": {"type": "string"},
-                "title": {"type": "string"},
-                "startDateTime": {"type": "string", "format": "date-time"},
-                "endDateTime": {"type": "string", "format": "date-time"},
-                "location": {"type": "string"},
-                "description": {"type": "string"}
-            },
-            "required": ["scheduleID", "userID", "title", "startDateTime", "endDateTime", "location", "description"]
-        },
-        "Category": {
-            "type": "object",
-            "properties": {
-                "categoryID": {"type": "string"},
-                "categoryName": {"type": "string"},
-                "description": {"type": "string"}
-            },
-            "required": ["categoryID", "categoryName", "description"]
-        },
-        "WorkoutPlan": {
-            "type": "object",
-            "properties": {
-                "workoutID": {"type": "string"},
-                "userID": {"type": "string"},
-                "workoutName": {"type": "string"}
-            },
-            "required": ["workoutID", "userID", "workoutName"]
-        },
-        "Exercise": {
-            "type": "object",
-            "properties": {
-                "exerciseID": {"type": "string"},
-                "exerciseName": {"type": "string"},
-                "reps": {"type": "integer"},
-                "sets": {"type": "integer"}
-            },
-            "required": ["exerciseID", "exerciseName", "reps", "sets"]
-        },
-        "WorkoutPlanExercises": {
-            "type": "object",
-            "properties": {
-                "workoutID": {"type": "string"},
-                "exerciseID": {"type": "string"}
-            },
-            "required": ["workoutID", "exerciseID"]
-        },
-        "WorkoutSchedule": {
-            "type": "object",
-            "properties": {
-                "scheduleID": {"type": "string"},
-                "workoutID": {"type": "string"}
-            },
-            "required": ["scheduleID", "workoutID"]
-        },
-        "WorkoutCompletion": {
-            "type": "object",
-            "properties": {
-                "userID": {"type": "string"},
-                "workoutID": {"type": "string"},
-                "completionDate": {"type": "string", "format": "date"},
-                "completionTime": {"type": "string", "format": "time"},
-                "workoutDone": {"type": "boolean"}
-            },
-            "required": ["userID", "workoutID", "completionDate", "completionTime", "workoutDone"]
-            }
-        }
     }
-}
+  }
