@@ -1,0 +1,18 @@
+{
+	"schema_version": "v1",
+	"name_for_human": "Schedule/Workout/Profile Planner/reader",
+	"name_for_model": "Schedule/Workout/Profile Planner/reader",
+	"description_for_human": "Plugin for reading and planning your schedule, workouts, and profile",
+	"description_for_model": "Use the Schedule/Workout/Profile Planner/reader plugin to read and plan user schedule, workouts, and profile",
+	"api": {
+		"type": "openapi",
+		"url": "https://important-garb-clam.cyclic.app/.well-known/openapi.json",
+		"is_user_authenticated": false
+	},
+	"auth": {
+		"type": "none"
+	},
+	"logo_url": "https://chat-calculator-plugin.supportmirage.repl.co/logo.png",
+	"contact_email": "support@mirage-studio.io",
+	"legal_info_url": "https://www.mirage-studio.io"
+}
