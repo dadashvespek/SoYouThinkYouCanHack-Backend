@@ -6,7 +6,7 @@
 	"description_for_model": "Use the Schedule/Workout/Profile Planner/reader plugin to read and plan user schedule, workouts, and profile",
 	"api": {
 		"type": "openapi",
-		"url": "https://chat-calculator-plugin.supportmirage.repl.co/openapi.json",
+		"url": "https://scary-fashion-eel.cyclic.app/.well-known/openapi.json",
 		"is_user_authenticated": false
 	},
 	"auth": {
