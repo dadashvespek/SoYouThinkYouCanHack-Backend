@@ -6,7 +6,7 @@
 	"description_for_model": "Use the Workout Planner and Tracker plugin to create, update, and keep track of workout plans based on userid",
 	"api": {
 		"type": "openapi",
-		"url": "https://scary-fashion-eel.cyclic.app/workoutplanneropenapi.json",
+		"url": "https://scary-fashion-eel.cyclic.app/workoutplannerplugin.json",
 		"is_user_authenticated": false
 	},
 	"auth": {
