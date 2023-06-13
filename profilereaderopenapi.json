@@ -14,7 +14,7 @@
         "/addUser": {
             "post": {
                 "operationId": "addUser",
-                "summary": "Add a new user, userid, email, name, and password must be provided by user, if not respond with a request asking for missing fields",
+                "summary": "Add a new user",
                 "requestBody": {
                     "description": "User to be added",
                     "required": true,
@@ -25,228 +25,113 @@
                             }
                         }
                     }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
             }
-        },
-        "/getUser/{userid}": {
-            "get": {
-                "operationId": "getUser",
-                "summary": "Get a user by id, make sure id is provided by user (dont assume an id) if user does not exist, respond with a request asking for a valid user id or ask if they want to register a new user",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "userid",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "description": "The ID of the user."
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/updateUser/{userid}": {
-            "put": {
-                "operationId": "updateUser",
-                "summary": "Update an existing user",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "userid",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "description": "The ID of the user."
-                    }
-                ],
-                "requestBody": {
-                    "description": "Updated user fields",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/User"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-      "/deleteUser/{userid}": {
-        "delete": {
-          "operationId": "deleteUser",
-          "summary": "Delete a user from the database",
-          "parameters": [
-            {
-              "in": "path",
-              "name": "userid",
-              "schema": {
-                "type": "string"
-              },
-              "required": true,
-              "description": "The ID of the user to be deleted."
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad Request",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
         }
-      }
     },
-      "components": {
+    "components": {
         "schemas": {
             "User": {
                 "type": "object",
                 "properties": {
-                    "userid": {
-                        "type": "string"
+                    "user_id": {
+                        "type": "integer",
+                        "format": "int32"
                     },
-                    "name": {
+                    "username": {
                         "type": "string"
                     },
                     "email": {
-                        "type": "string",
-                        "format": "email"
+                        "type": "string"
                     },
                     "password": {
                         "type": "string"
+                    },
+                    "full_name": {
+                        "type": "string"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": ["Male", "Female", "Other"]
+                    },
+                    "height": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "activity_level": {
+                        "type": "string",
+                        "enum": ["sedentary", "moderate", "active"]
+                    },
+                    "goal": {
+                        "type": "string",
+                        "enum": ["weight loss", "muscle gain", "maintenance"]
+                    },
+                    "body_fat_percentage": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "fitness_level": {
+                        "type": "string",
+                        "enum": ["beginner", "intermediate", "advanced"]
+                    },
+                    "target_weight": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "target_calories": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "target_steps": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "preferred_workout_days": {
+                        "type": "string"
+                    },
+                    "preferred_workout_time": {
+                        "type": "string",
+                        "format": "time"
+                    },
+                    "exercise_frequency": {
+                        "type": "string",
+                        "enum": ["daily", "3 times a week", "4 times a week", "5 times a week", "6 times a week", "weekly"]
+                    },
+                    "exercise_duration": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "resting_heart_rate": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "max_heart_rate": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "injury_history": {
+                        "type": "string"
+                    },
+                    "allergies": {
+                        "type": "string"
+                    },
+                    "workout_preferences": {
+                        "type": "string"
+                    },
+                    "workout_location": {
+                        "type": "string"
                     }
-                },
-                "required": ["userid", "name", "email", "password"]
-            },
-            "Error": {
-              "type": "object",
-              "properties": {
-                  "errorcode": {
-                      "type": "string"
-                  },
-                  "message": {
-                      "type": "string"
-                  }
-              },
-              "required": ["errorcode", "message"]
-          }
+                }
+            }
         }
     }
-  }
+    
+}

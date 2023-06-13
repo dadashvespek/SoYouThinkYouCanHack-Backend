@@ -3,28 +3,6 @@ const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 const path = require('path');
-
-// Extended: https://swagger.io/specification/#infoObject
-const swaggerOptions = {
-    swaggerDefinition: {
-      openapi: '3.0.0',
-      info: {
-        title: 'Workout API',
-        version: '1.0.0',
-        description: 'This is a simple CRUD API application made with Express and documented with Swagger',
-      },
-      servers: [
-        {
-          url: 'http://localhost:5000',
-        },
-      ],
-    },
-    // ['.routes/*.js']
-    apis: ['index.js'], // files containing annotations as above
-  };
-  
-  const swaggerDocs = swaggerJsDoc(swaggerOptions);
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
   
 // serve all static routes
 app.use(express.static(path.join(__dirname)));
@@ -51,7 +29,7 @@ app.post('/addUser', async (req, res) => {
 
   // If all required fields are present, proceed with the insert operation
   const { data, error } = await supabase
-      .from('users')
+      .from('user_profile')
       .insert([
           { ...userData }
       ]);
@@ -65,12 +43,12 @@ app.post('/addUser', async (req, res) => {
 app.get('/getUser/:userid', async (req, res) => {
     const userid = req.params.userid;
     const { data, error } = await supabase
-        .from('users')
+        .from('user_profile')
         .select('*')
         .eq('userid', userid);
     if (error) {
         // Check if the error message indicates that the user doesn't exist
-        if (error.message.includes('relation "users" does not exist')) {
+        if (error.message.includes('relation "user_profile" does not exist')) {
             return res.status(404).json({ error: `${userid} not found. respond by asking user if they would like to register (then you can use addUser to register them) or if they entered the wrong userid` });
         } else {
             return res.status(400).json({ error: error.message });
@@ -80,12 +58,50 @@ app.get('/getUser/:userid', async (req, res) => {
     return res.status(200).json({ data });
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // This route updates an existing user in the database
 app.put('/updateUser/:userid', async (req, res) => {
   const userid = req.params.userid;
   const updatedFields = req.body;
   const { data, error } = await supabase
-    .from('users')
+    .from('user_profile')
     .update(updatedFields)
     .match({ userid });
 
@@ -97,7 +113,7 @@ app.put('/updateUser/:userid', async (req, res) => {
 app.delete('/deleteUser/:userid', async (req, res) => {
   const userid = req.params.userid;
   const { data, error } = await supabase
-    .from('users')
+    .from('user_profile')
     .delete()
     .match({ userid });
 
@@ -368,7 +384,7 @@ app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) =>
  * /updateUser/{userid}:
  *   put:
  *     description: This route updates an existing user in the database
- *     tags: [Users]
+ *     tags: [user_profile]
  *     parameters:
  *       - in: path
  *         name: userid
@@ -402,7 +418,7 @@ app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) =>
  * /deleteUser/{userid}:
  *   delete:
  *     description: This route deletes a user from the database
- *     tags: [Users]
+ *     tags: [user_profile]
  *     parameters:
  *       - in: path
  *         name: userid
@@ -943,7 +959,7 @@ app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) =>
  * /addUser:
  *   post:
  *     description: This route adds a new user to the database
- *     tags: [Users]
+ *     tags: [user_profile]
  *     requestBody:
  *       required: true
  *       content:
@@ -969,7 +985,7 @@ app.post('/addExerciseToWorkoutPlan/:workoutid/:exerciseid', async (req, res) =>
  * /getUser/{userid}:
  *   get:
  *     description: This route retrieves a user from the database based on their id
- *     tags: [Users]
+ *     tags: [user_profile]
  *     parameters:
  *       - in: path
  *         name: userid
