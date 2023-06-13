@@ -575,11 +575,11 @@
                             "schema": {
                                 "type": "object",
                                 "properties": {
-                                    "workoutName": {
+                                    "workoutname": {
                                         "type": "string"
                                     }
                                 },
-                                "required": ["workoutName"]
+                                "required": ["workoutname"]
                             }
                         }
                     },
@@ -801,7 +801,7 @@
                       "schema": {
                         "type": "object",
                         "properties": {
-                          "exerciseName": {
+                          "exercisename": {
                             "type": "string"
                           },
                           "reps": {
@@ -811,7 +811,7 @@
                             "type": "integer"
                           }
                         },
-                        "required": ["exerciseName", "reps", "sets"]
+                        "required": ["exercisename", "reps", "sets"]
                       }
                     }
                   }
@@ -1155,7 +1155,7 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "completionDate": {
+                                "completiondate": {
                                     "type": "string",
                                     "format": "date"
                                 },
@@ -1163,7 +1163,7 @@
                                     "type": "string"
                                 }
                             },
-                            "required": ["completionDate", "completionTime"]
+                            "required": ["completiondate", "completionTime"]
                         }
                     }
                 },
@@ -1289,11 +1289,11 @@
                   "title": {
                       "type": "string"
                   },
-                  "startDateTime": {
+                  "startdateTime": {
                       "type": "string",
                       "format": "date-time"
                   },
-                  "endDateTime": {
+                  "enddateTime": {
                       "type": "string",
                       "format": "date-time"
                   },
@@ -1304,7 +1304,7 @@
                       "type": "string"
                   }
               },
-              "required": ["scheduleid", "userid", "title", "startDateTime", "endDateTime", "location", "description"]
+              "required": ["scheduleid", "userid", "title", "startdatetime", "endedatetime", "location", "description"]
           },
           "WorkoutPlan": {
               "type": "object",
@@ -1315,11 +1315,11 @@
                   "userid": {
                       "type": "string"
                   },
-                  "workoutName": {
+                  "workoutname": {
                       "type": "string"
                   }
               },
-              "required": ["workoutid", "userid", "workoutName"]
+              "required": ["workoutid", "userid", "workoutname"]
           },
           "Exercise": {
               "type": "object",
@@ -1327,7 +1327,7 @@
                   "exerciseid": {
                       "type": "string"
                   },
-                  "exerciseName": {
+                  "exercisename": {
                       "type": "string"
                   },
                   "reps": {
@@ -1337,7 +1337,7 @@
                       "type": "integer"
                   }
               },
-              "required": ["exerciseid", "exerciseName", "reps", "sets"]
+              "required": ["exerciseid", "exercisename", "reps", "sets"]
           },
           "WorkoutPlanExercise": {
               "type": "object",
@@ -1372,7 +1372,7 @@
                   "workoutid": {
                       "type": "string"
                   },
-                  "completionDate": {
+                  "completiondate": {
                       "type": "string",
                       "format": "date"
                   },
@@ -1383,7 +1383,7 @@
                       "type": "boolean"
                   }
               },
-              "required": ["userid", "workoutid", "completionDate", "completionTime", "workoutDone"]
+              "required": ["userid", "workoutid", "completiondate", "completionTime", "workoutDone"]
           },
           "Error": {
             "type": "object",
