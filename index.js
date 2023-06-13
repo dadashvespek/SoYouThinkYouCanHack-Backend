@@ -25,16 +25,11 @@ app.route('/schedule/:user_id/:weekOffset?')
         }
 
         const currentDate = new Date();
-        console.log(`Current date: ${currentDate}`);
         currentDate.setDate(currentDate.getDate() + (weekOffset * 7)); // Apply week offset
-        console.log(`Current date (after offset): ${currentDate}`);
         const currentDayOfWeek = currentDate.getDay();
-        console.log(`Current day of week: ${currentDayOfWeek}`);
         // Calculate start (Monday) and end (Sunday) of the week
         const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)));
-        console.log(`Start of week: ${startOfWeek}`);
         const endOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + 7));
-        console.log(`End of week: ${endOfWeek}`);
 
         const weekData = data.filter(entry => {
             const startDateTime = new Date(entry.start_datetime);
@@ -44,8 +39,6 @@ app.route('/schedule/:user_id/:weekOffset?')
                 return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
             }
         });
-
-        console.log(`Week data: ${JSON.stringify(weekData)}`);
         const transformedData = {
             user_id: user_id,
             weekOffset: weekOffset,
