@@ -3,7 +3,7 @@
 	"name_for_human": "Workout Planner and Tracker",
 	"name_for_model": "Workout Planner and Tracker",
 	"description_for_human": "Plugin for creating, updating, and tracking workout plans",
-	"description_for_model": "Use the Workout Planner and Tracker plugin to create, update, and keep track of your workout plans",
+	"description_for_model": "Use the Workout Planner and Tracker plugin to create, update, and keep track of workout plans based on userid",
 	"api": {
 		"type": "openapi",
 		"url": "https://scary-fashion-eel.cyclic.app/workoutplanneropenapi.json",
