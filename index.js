@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //add user
 app.post('/addUser', async (req, res) => {
-  const requiredFields = ['userid', 'email', 'password']; // replace with your actual required fields
+  const requiredFields = [ 'email', 'password']; // replace with your actual required fields
   const userData = req.body;
   
   // check if all required fields are present
