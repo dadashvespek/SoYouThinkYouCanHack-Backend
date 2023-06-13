@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 const path = require('path');
 
 // Extended: https://swagger.io/specification/#infoObject
