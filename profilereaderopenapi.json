@@ -63,7 +63,7 @@
         "/getUser/{userid}": {
             "get": {
                 "operationid": "getUser",
-                "summary": "Get a user by id, if user does not exist, ask user if they entered the correct or if they would like to register",
+                "summary": "Get a user by id, make sure user provides id, if not respond with a prompt asking for their id, if user does not exist, ask user if they entered the correct id or if they would like to register",
                 "parameters": [
                     {
                         "in": "path",
