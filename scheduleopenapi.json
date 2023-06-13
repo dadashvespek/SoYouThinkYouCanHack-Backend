@@ -297,7 +297,7 @@
                 "properties": {
                     "scheduleid": {
                         "type": "string",
-                        "description": "Schedule ID"
+                        "description": "Schedule ID, automatically generated when creating new schedule"
                     },
                     "userid": {
                         "type": "string",
@@ -327,11 +327,13 @@
                     }
                 },
                 "required": [
-                    "scheduleid",
                     "userid",
                     "title",
                     "startDateTime",
                     "endDateTime"
+                ],
+                "optional": [
+                    "scheduleid"
                 ]
             }
         }
