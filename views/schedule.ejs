@@ -80,6 +80,10 @@
 </head>
 <body>
   <h1>Schedule for user <%= user_id %></h1>
+  <div class="week-navigation">
+    <a href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
+    <a href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
+</div>
   <div class="table-container">
   <table>
     <thead>
