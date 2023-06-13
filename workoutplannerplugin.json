@@ -1,0 +1,437 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "Workout Planner API",
+      "description": "API for managing workout plans, exercises and their schedules",
+      "version": "v1"
+    },
+    "servers": [
+      {
+        "url": "https://scary-fashion-eel.cyclic.app"
+      }
+    ],
+    "paths": {
+      "/getWorkoutPlan/{workoutid}": {
+        "get": {
+          "summary": "Get a workout plan",
+          "parameters": [
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Workout plan retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/WorkoutPlan"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/updateWorkoutPlan/{workoutid}": {
+        "put": {
+          "summary": "Update a workout plan",
+          "parameters": [
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutPlan"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Workout plan updated successfully"
+            }
+          }
+        }
+      },
+      "/deleteWorkoutPlan/{workoutid}": {
+        "delete": {
+          "summary": "Delete a workout plan",
+          "parameters": [
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Workout plan deleted successfully"
+            }
+          }
+        }
+      },
+      "/getUserWorkoutPlans/{userid}": {
+        "get": {
+          "summary": "Get workout plans for a user",
+          "parameters": [
+            {
+              "name": "userid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Workout plans retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WorkoutPlan"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/addExercise": {
+        "post": {
+          "summary": "Add an exercise",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Exercise added successfully"
+            }
+          }
+        }
+      },
+      "/getExercise/{exerciseid}": {
+        "get": {
+          "summary": "Get an exercise",
+          "parameters": [
+            {
+              "name": "exerciseid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Exercise retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Exercise"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/updateExercise/{exerciseid}": {
+        "put": {
+          "summary": "Update an exercise",
+          "parameters": [
+            {
+              "name": "exerciseid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Exercise"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Exercise updated successfully"
+            }
+          }
+        }
+      },
+      "/deleteExercise/{exerciseid}": {
+        "delete": {
+          "summary": "Delete an exercise",
+          "parameters": [
+            {
+              "name": "exerciseid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Exercise deleted successfully"
+            }
+          }
+        }
+      },
+      "/getExercises": {
+        "get": {
+          "summary": "Get all exercises",
+          "responses": {
+            "200": {
+              "description": "Exercises retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Exercise"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/addExerciseToWorkoutPlan/{workoutid}/{exerciseid}": {
+        "post": {
+          "summary": "Add an exercise to a workout plan",
+          "parameters": [
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "exerciseid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Exercise added to workout plan successfully"
+            }
+          }
+        }
+      },
+      "/removeExerciseFromWorkoutPlan/{workoutid}/{exerciseid}": {
+        "delete": {
+          "summary": "Remove an exercise from a workout plan",
+          "parameters": [
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "exerciseid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Exercise removed from workout plan successfully"
+            }
+          }
+        }
+      },
+      "/completeWorkout/{userid}/{workoutid}": {
+        "post": {
+          "summary": "Mark a workout as completed",
+          "parameters": [
+            {
+              "name": "userid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "workoutid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutCompletion"
+                }
+              }
+            },
+            "required": true
+          },
+          "responses": {
+            "200": {
+              "description": "Workout marked as completed successfully"
+            }
+          }
+        }
+      },
+      "/getCompletedWorkouts/{userid}": {
+        "get": {
+          "summary": "Get completed workouts for a user",
+          "parameters": [
+            {
+              "name": "userid",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Completed workouts retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/WorkoutCompletion"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "properties": {
+            "userid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          }
+        },
+        "WorkoutPlan": {
+          "type": "object",
+          "properties": {
+            "workoutid": {
+              "type": "string"
+            },
+            "userid": {
+              "type": "string"
+            },
+            "workoutName": {
+              "type": "string"
+            }
+          }
+        },
+        "Exercise": {
+          "type": "object",
+          "properties": {
+            "exerciseid": {
+              "type": "string"
+            },
+            "exerciseName": {
+              "type": "string"
+            },
+            "reps": {
+              "type": "integer"
+            },
+            "sets": {
+              "type": "integer"
+            }
+          }
+        },
+        "WorkoutCompletion": {
+          "type": "object",
+          "properties": {
+            "userid": {
+              "type": "string"
+            },
+            "workoutid": {
+              "type": "string"
+            },
+            "completionDate": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "completionTime": {
+              "type": "string"
+            },
+            "workoutDone": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+  
