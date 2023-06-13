@@ -1,9 +1,9 @@
 {
 	"schema_version": "v1",
-	"name_for_human": "Schedule/Workout/Profile Planner/reader",
-	"name_for_model": "Schedule/Workout/Profile Planner/reader",
-	"description_for_human": "Plugin for reading and planning your schedule, workouts, and profile",
-	"description_for_model": "Use the Schedule/Workout/Profile Planner/reader plugin to read and plan user schedule, workouts, and profile",
+	"name_for_human": "Profile modifier/reader",
+	"name_for_model": "Profile modifier/reader",
+	"description_for_human": "Plugin for reading and planning your profile",
+	"description_for_model": "Use the Profile modifier/reader plugin to read and plan user profile",
 	"api": {
 		"type": "openapi",
 		"url": "https://scary-fashion-eel.cyclic.app/profilereaderopenapi.json",
