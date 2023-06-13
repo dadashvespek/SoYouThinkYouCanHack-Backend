@@ -2,7 +2,7 @@
     "openapi": "3.0.1",
     "info": {
       "title": "User Management Plugin",
-      "description": "A plugin that allows for basic user operations like adding, fetching, and updating user profiles.",
+      "description": "A plugin that allows for basic user operations like adding, fetching, and updating users.",
       "version": "v1"
     },
     "servers": [
@@ -13,10 +13,10 @@
     "paths": {
         "/addUser": {
             "post": {
-                "operationid": "addUser",
+                "operationId": "addUser",
                 "summary": "Add a new user",
                 "requestBody": {
-                    "description": "User to be added, make sure user provides their name, email and password, if not provided, respond with a request for them to provide it",
+                    "description": "User to be added",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -62,8 +62,8 @@
         },
         "/getUser/{userid}": {
             "get": {
-                "operationid": "getUser",
-                "summary": "Get a user by id, make sure user provides id, if not respond with a prompt asking for their id, if user does not exist, ask user if they entered the correct id or if they would like to register",
+                "operationId": "getUser",
+                "summary": "Get a user by ID",
                 "parameters": [
                     {
                         "in": "path",
@@ -72,7 +72,7 @@
                             "type": "string"
                         },
                         "required": true,
-                        "description": "The id of the user."
+                        "description": "The ID of the user."
                     }
                 ],
                 "responses": {
@@ -111,7 +111,7 @@
         },
         "/updateUser/{userid}": {
             "put": {
-                "operationid": "updateUser",
+                "operationId": "updateUser",
                 "summary": "Update an existing user",
                 "parameters": [
                     {
@@ -121,7 +121,7 @@
                             "type": "string"
                         },
                         "required": true,
-                        "description": "The id of the user."
+                        "description": "The ID of the user."
                     }
                 ],
                 "requestBody": {
@@ -171,7 +171,7 @@
         },
       "/deleteUser/{userid}": {
         "delete": {
-          "operationid": "deleteUser",
+          "operationId": "deleteUser",
           "summary": "Delete a user from the database",
           "parameters": [
             {
@@ -181,7 +181,7 @@
                 "type": "string"
               },
               "required": true,
-              "description": "The id of the user to be deleted."
+              "description": "The ID of the user to be deleted."
             }
           ],
           "responses": {
