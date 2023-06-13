@@ -1,137 +1,210 @@
 {
-    "openapi": "3.0.1",
-    "info": {
-      "title": "User Management and Workout Plan",
-      "description": "API endpoints for user management and workout plan",
-      "version": "v1"
-    },
-    "servers": [
-      {
-        "url": "https://scary-fashion-eel.cyclic.app/"
-      }
-    ],
-    "paths": {
+  "openapi": "3.0.1",
+  "info": {
+    "title": "User Management Plugin",
+    "description": "A plugin that allows for basic user operations like adding, fetching, and updating users.",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://user-management-plugin.repl.co"
+    }
+  ],
+  "paths": {
       "/addUser": {
-        "post": {
-          "operationId": "addUser",
-          "summary": "Add a new user",
-          "requestBody": {
-            "description": "User information",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            },
-            "required": true
-          },
-          "responses": {
-            "200": {
-              "description": "OK",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserResponse"
+          "post": {
+              "operationId": "addUser",
+              "summary": "Add a new user",
+              "requestBody": {
+                  "description": "User to be added",
+                  "required": true,
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/User"
+                          }
+                      }
                   }
-                }
-              }
-            },
-            "400": {
-              "description": "Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
+              },
+              "responses": {
+                  "200": {
+                      "description": "OK",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "data": {
+                                          "$ref": "#/components/schemas/User"
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  },
+                  "400": {
+                      "description": "Error",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "error": {
+                                          "type": "string"
+                                      }
+                                  }
+                              }
+                          }
+                      }
                   }
-                }
               }
-            }
           }
-        }
       },
       "/getUser/{userid}": {
-        "get": {
-          "operationId": "getUser",
-          "summary": "Get a user by ID",
-          "parameters": [
-            {
-              "in": "path",
-              "name": "userid",
-              "schema": {
-                "type": "string"
-              },
-              "required": true,
-              "description": "User ID"
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserResponse"
+          "get": {
+              "operationId": "getUser",
+              "summary": "Get a user by ID",
+              "parameters": [
+                  {
+                      "in": "path",
+                      "name": "userid",
+                      "schema": {
+                          "type": "string"
+                      },
+                      "required": true,
+                      "description": "The ID of the user."
                   }
-                }
-              }
-            },
-            "400": {
-              "description": "Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
+              ],
+              "responses": {
+                  "200": {
+                      "description": "OK",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "data": {
+                                          "$ref": "#/components/schemas/User"
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  },
+                  "400": {
+                      "description": "Error",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "error": {
+                                          "type": "string"
+                                      }
+                                  }
+                              }
+                          }
+                      }
                   }
-                }
               }
-            }
           }
-        }
       },
       "/updateUser/{userid}": {
-        "put": {
-          "operationId": "updateUser",
-          "summary": "Update a user",
-          "parameters": [
-            {
-              "in": "path",
-              "name": "userid",
-              "schema": {
-                "type": "string"
+          "put": {
+              "operationId": "updateUser",
+              "summary": "Update an existing user",
+              "parameters": [
+                  {
+                      "in": "path",
+                      "name": "userid",
+                      "schema": {
+                          "type": "string"
+                      },
+                      "required": true,
+                      "description": "The ID of the user."
+                  }
+              ],
+              "requestBody": {
+                  "description": "Updated user fields",
+                  "required": true,
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/User"
+                          }
+                      }
+                  }
               },
-              "required": true,
-              "description": "User ID"
-            }
-          ],
-          "requestBody": {
-            "description": "Updated user information",
+              "responses": {
+                  "200": {
+                      "description": "OK",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "data": {
+                                          "$ref": "#/components/schemas/User"
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  },
+                  "400": {
+                      "description": "Error",
+                      "content": {
+                          "application/json": {
+                              "schema": {
+                                  "type": "object",
+                                  "properties": {
+                                      "error": {
+                                          "type": "string"
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      },
+    "/deleteUser/{userid}": {
+      "delete": {
+        "operationId": "deleteUser",
+        "summary": "Delete a user from the database",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userid",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the user to be deleted."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/User"
                 }
               }
-            },
-            "required": true
+            }
           },
-          "responses": {
-            "200": {
-              "description": "OK",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UserResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Error"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -140,47 +213,1190 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "User": {
-          "type": "object",
-          "properties": {
-            "userid": {
-              "type": "string",
-              "description": "User ID"
+    "/addSchedule/{userid}": {
+      "post": {
+        "operationId": "addSchedule",
+        "summary": "Add a new schedule to the database for a specific user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userid",
+            "schema": {
+              "type": "string"
             },
-            "name": {
-              "type": "string",
-              "description": "User name"
-            },
-            "email": {
-              "type": "string",
-              "description": "User email"
-            },
-            "password": {
-              "type": "string",
-              "description": "User password"
-            }
+            "required": true,
+            "description": "The ID of the user for whom the schedule is to be added."
           }
-        },
-        "UserResponse": {
-          "type": "object",
-          "properties": {
-            "data": {
-              "$ref": "#/components/schemas/User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Schedule"
+              }
             }
-          }
+          },
+          "required": true
         },
-        "Error": {
-          "type": "object",
-          "properties": {
-            "error": {
-              "type": "string",
-              "description": "Error message"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
             }
           }
         }
       }
+    },
+    "/updateSchedule/{userid}/{scheduleid}": {
+      "put": {
+        "operationId": "updateSchedule",
+        "summary": "Update an existing schedule in the database for a specific user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userid",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the user for whom the schedule is to be updated."
+          },
+          {
+            "in": "path",
+            "name": "scheduleid",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The ID of the schedule to be updated."
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Schedule"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schedule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+      "/deleteSchedule/{userid}/{scheduleid}": {
+        "delete": {
+          "operationId": "deleteSchedule",
+          "summary": "Delete a user's schedule",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The user's ID."
+            },
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The schedule's ID."
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/Schedule"
+                        }
+                      },
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/getSchedule/{userid}/{scheduleid}": {
+        "get": {
+          "operationId": "getSchedule",
+          "summary": "Get a specific schedule for a user",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The user's ID."
+            },
+            {
+              "in": "path",
+              "name": "scheduleid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The schedule's ID."
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "$ref": "#/components/schemas/Schedule"
+                      },
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/getSchedules/{userid}": {
+        "get": {
+          "operationId": "getSchedules",
+          "summary": "Get schedules for a user based on query parameters",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The user's ID."
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/Schedule"
+                        }
+                      },
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+        "/getWorkoutPlan/{workoutid}": {
+            "get": {
+                "operationId": "getWorkoutPlan",
+                "summary": "Retrieves the details of a specific workout plan",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "workoutid",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "The ID of the workout plan to retrieve."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WorkoutPlan"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/updateWorkoutPlan/{workoutid}": {
+            "put": {
+                "operationId": "updateWorkoutPlan",
+                "summary": "Updates the name of a specific workout plan",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "workoutid",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "The ID of the workout plan to update."
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "workoutName": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["workoutName"]
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WorkoutPlan"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deleteWorkoutPlan/{workoutid}": {
+            "delete": {
+                "operationId": "deleteWorkoutPlan",
+                "summary": "Deletes a specific workout plan",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "workoutid",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "The ID of the workout plan to delete."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+          "/getUserWorkoutPlans/{userid}": {
+            "get": {
+              "operationId": "getUserWorkoutPlans",
+              "summary": "Retrieve all workout plans for a specific user",
+              "parameters": [
+                {
+                  "in": "path",
+                  "name": "userid",
+                  "schema": {
+                    "type": "string"
+                  },
+                  "required": true,
+                  "description": "The user ID."
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "OK",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/WorkoutPlan"
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/addExercise": {
+            "post": {
+              "operationId": "addExercise",
+              "summary": "Add a new exercise",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Exercise"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "OK",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Exercise"
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/getExercise/{exerciseid}": {
+            "get": {
+              "operationId": "getExercise",
+              "summary": "Retrieve the details of a specific exercise",
+              "parameters": [
+                {
+                  "in": "path",
+                  "name": "exerciseid",
+                  "schema": {
+                    "type": "string"
+                  },
+                  "required": true,
+                  "description": "The exercise ID."
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "OK",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Exercise"
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+            "/updateExercise/{exerciseid}": {
+              "put": {
+                "operationId": "updateExercise",
+                "summary": "Update a specific exercise",
+                "parameters": [
+                  {
+                    "in": "path",
+                    "name": "exerciseid",
+                    "schema": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the exercise to update."
+                  }
+                ],
+                "requestBody": {
+                  "required": true,
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "exerciseName": {
+                            "type": "string"
+                          },
+                          "reps": {
+                            "type": "integer"
+                          },
+                          "sets": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": ["exerciseName", "reps", "sets"]
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "$ref": "#/components/schemas/Exercise"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "400": {
+                    "description": "Bad Request",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "error": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/deleteExercise/{exerciseid}": {
+              "delete": {
+                "operationId": "deleteExercise",
+                "summary": "Delete a specific exercise",
+                "parameters": [
+                  {
+                    "in": "path",
+                    "name": "exerciseid",
+                    "schema": {
+                      "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the exercise to delete."
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "object",
+                              "description": "Confirmation of the deleted exercise."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "400": {
+                    "description": "Bad Request",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "error": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/getExercises": {
+              "get": {
+                "operationId": "getExercises",
+                "summary": "Retrieve all exercises",
+                "responses": {
+                  "200": {
+                    "description": "OK",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "data": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Exercise"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "400": {
+                    "description": "Bad Request",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "error": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+              "/addExerciseToWorkoutPlan/{workoutid}/{exerciseid}": {
+                  "post": {
+                      "operationId": "addExerciseToWorkoutPlan",
+                      "summary": "Add an exercise to a workout plan",
+                      "parameters": [
+                          {
+                              "in": "path",
+                              "name": "workoutid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the workout plan."
+                          },
+                          {
+                              "in": "path",
+                              "name": "exerciseid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the exercise."
+                          }
+                      ],
+                      "responses": {
+                          "200": {
+                              "description": "OK",
+                              "content": {
+                                  "application/json": {
+                                      "schema": {
+                                          "$ref": "#/components/schemas/WorkoutPlanExercise"
+                                      }
+                                  }
+                              }
+                          },
+                          "400": {
+                              "description": "Bad Request"
+                          }
+                      }
+                  }
+              },
+              "/removeExerciseFromWorkoutPlan/{workoutid}/{exerciseid}": {
+                  "delete": {
+                      "operationId": "removeExerciseFromWorkoutPlan",
+                      "summary": "Remove an exercise from a workout plan",
+                      "parameters": [
+                          {
+                              "in": "path",
+                              "name": "workoutid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the workout plan."
+                          },
+                          {
+                              "in": "path",
+                              "name": "exerciseid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the exercise."
+                          }
+                      ],
+                      "responses": {
+                          "200": {
+                              "description": "OK",
+                              "content": {
+                                  "application/json": {
+                                      "schema": {
+                                          "$ref": "#/components/schemas/WorkoutPlanExercise"
+                                      }
+                                  }
+                              }
+                          },
+                          "400": {
+                              "description": "Bad Request"
+                          }
+                      }
+                  }
+              },
+              "/addWorkoutPlanToSchedule/{scheduleid}/{workoutid}": {
+                  "post": {
+                      "operationId": "addWorkoutPlanToSchedule",
+                      "summary": "Add a workout plan to a schedule",
+                      "parameters": [
+                          {
+                              "in": "path",
+                              "name": "scheduleid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the schedule."
+                          },
+                          {
+                              "in": "path",
+                              "name": "workoutid",
+                              "schema": {
+                                  "type": "string"
+                              },
+                              "required": true,
+                              "description": "The ID of the workout plan."
+                          }
+                      ],
+                      "responses": {
+                          "200": {
+                              "description": "OK",
+                              "content": {
+                                  "application/json": {
+                                      "schema": {
+                                          "$ref": "#/components/schemas/WorkoutSchedule"
+                                      }
+                                  }
+                              }
+                          },
+                          "400": {
+                              "description": "Bad Request"
+                          }
+                      }
+                  }
+              },
+    "/removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}": {
+        "delete": {
+            "operationId": "removeWorkoutPlanFromSchedule",
+            "summary": "Removes a workout plan from a schedule",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "scheduleid",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the schedule from which to remove the workout plan."
+                },
+                {
+                    "in": "path",
+                    "name": "workoutid",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the workout plan to remove."
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/WorkoutSchedule"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "error": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/completeWorkout/{userid}/{workoutid}": {
+        "post": {
+            "operationId": "completeWorkout",
+            "summary": "Marks a workout plan as completed for a user",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "userid",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the user who completed the workout plan."
+                },
+                {
+                    "in": "path",
+                    "name": "workoutid",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the workout plan that was completed."
+                }
+            ],
+            "requestBody": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "completionDate": {
+                                    "type": "string",
+                                    "format": "date"
+                                },
+                                "completionTime": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["completionDate", "completionTime"]
+                        }
+                    }
+                },
+                "required": true
+            },
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "$ref": "#/components/schemas/WorkoutCompletion"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "error": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/getCompletedWorkouts/{userid}": {
+        "get": {
+            "operationId": "getCompletedWorkouts",
+            "summary": "Gets all completed workouts for a user",
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "userid",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "required": true,
+                    "description": "The ID of the user whose completed workouts to get."
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/WorkoutCompletion"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "error": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
+  },
+    "components": {
+      "schemas": {
+          "User": {
+              "type": "object",
+              "properties": {
+                  "userid": {
+                      "type": "string"
+                  },
+                  "name": {
+                      "type": "string"
+                  },
+                  "email": {
+                      "type": "string",
+                      "format": "email"
+                  },
+                  "password": {
+                      "type": "string"
+                  }
+              },
+              "required": ["userid", "name", "email", "password"]
+          },
+          "Schedule": {
+              "type": "object",
+              "properties": {
+                  "scheduleid": {
+                      "type": "string"
+                  },
+                  "userid": {
+                      "type": "string"
+                  },
+                  "title": {
+                      "type": "string"
+                  },
+                  "startDateTime": {
+                      "type": "string",
+                      "format": "date-time"
+                  },
+                  "endDateTime": {
+                      "type": "string",
+                      "format": "date-time"
+                  },
+                  "location": {
+                      "type": "string"
+                  },
+                  "description": {
+                      "type": "string"
+                  }
+              },
+              "required": ["scheduleid", "userid", "title", "startDateTime", "endDateTime", "location", "description"]
+          },
+          "WorkoutPlan": {
+              "type": "object",
+              "properties": {
+                  "workoutid": {
+                      "type": "string"
+                  },
+                  "userid": {
+                      "type": "string"
+                  },
+                  "workoutName": {
+                      "type": "string"
+                  }
+              },
+              "required": ["workoutid", "userid", "workoutName"]
+          },
+          "Exercise": {
+              "type": "object",
+              "properties": {
+                  "exerciseid": {
+                      "type": "string"
+                  },
+                  "exerciseName": {
+                      "type": "string"
+                  },
+                  "reps": {
+                      "type": "integer"
+                  },
+                  "sets": {
+                      "type": "integer"
+                  }
+              },
+              "required": ["exerciseid", "exerciseName", "reps", "sets"]
+          },
+          "WorkoutPlanExercise": {
+              "type": "object",
+              "properties": {
+                  "workoutid": {
+                      "type": "string"
+                  },
+                  "exerciseid": {
+                      "type": "string"
+                  }
+              },
+              "required": ["workoutid", "exerciseid"]
+          },
+          "WorkoutSchedule": {
+              "type": "object",
+              "properties": {
+                  "scheduleid": {
+                      "type": "string"
+                  },
+                  "workoutid": {
+                      "type": "string"
+                  }
+              },
+              "required": ["scheduleid", "workoutid"]
+          },
+          "WorkoutCompletion": {
+              "type": "object",
+              "properties": {
+                  "userid": {
+                      "type": "string"
+                  },
+                  "workoutid": {
+                      "type": "string"
+                  },
+                  "completionDate": {
+                      "type": "string",
+                      "format": "date"
+                  },
+                  "completionTime": {
+                      "type": "string"
+                  },
+                  "workoutDone": {
+                      "type": "boolean"
+                  }
+              },
+              "required": ["userid", "workoutid", "completionDate", "completionTime", "workoutDone"]
+          },
+          "Error": {
+            "type": "object",
+            "properties": {
+                "errorcode": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "required": ["errorcode", "message"]
+        }
+      }
   }
-  
+}
