@@ -73,7 +73,7 @@ app.get('/getUser/:userid', async (req, res) => {
     if (error) {
         // Check if the error message indicates that the user doesn't exist
         if (error.message.includes('relation "users" does not exist')) {
-            return res.status(404).json({ error: `${userid} not registered. Ask user if they would like to register (then you can use addUser to register them)` });
+            return res.status(404).json({ error: `${userid} not found. respond by asking user if they would like to register (then you can use addUser to register them) or if they entered the wrong userid` });
         } else {
             return res.status(400).json({ error: error.message });
         }
