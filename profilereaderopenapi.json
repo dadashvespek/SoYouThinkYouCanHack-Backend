@@ -14,7 +14,7 @@
         "/addUser": {
             "post": {
                 "operationId": "addUser",
-                "summary": "Add a new user",
+                "summary": "Add a new user, userid, email, name, and password must be provided by user, if not respond with a request asking for missing fields",
                 "requestBody": {
                     "description": "User to be added",
                     "required": true,
@@ -63,7 +63,7 @@
         "/getUser/{userid}": {
             "get": {
                 "operationId": "getUser",
-                "summary": "Get a user by ID",
+                "summary": "Get a user by id, make sure id is provided by user (dont assume an id) if user does not exist, respond with a request asking for a valid user id or ask if they want to register a new user",
                 "parameters": [
                     {
                         "in": "path",
