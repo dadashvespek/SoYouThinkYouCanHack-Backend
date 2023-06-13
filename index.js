@@ -38,21 +38,50 @@ app.route('/schedule/:user_id/:weekOffset?')
 
         const weekData = data.filter(entry => {
             const startDateTime = new Date(entry.start_datetime);
-            return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
+            if (entry.repeating === 'Everyday' || entry.repeating === 'Everyweek') {
+                return true;
+            } else {
+                return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
+            }
         });
+
         console.log(`Week data: ${JSON.stringify(weekData)}`);
         const transformedData = {
             user_id: user_id,
             weekOffset: weekOffset,
-            schedule: weekData.map(entry => ({
-                dayOfWeek: new Date(entry.start_datetime).getDay(),
-                startHour: new Date(entry.start_datetime).getHours(),
-                endHour: new Date(entry.end_datetime).getHours(),
-                event_name: entry.event_name,
-                location: entry.location
-            }))
+            schedule: weekData.flatMap(entry => {
+                const startDateTime = new Date(entry.start_datetime);
+                const endDateTime = new Date(entry.end_datetime);
+                if (entry.repeating === 'Everyday') {
+                    // Create an entry for each day of the week
+                    return Array(7).fill().map((_, dayOfWeek) => ({
+                        dayOfWeek: dayOfWeek,
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
+                        event_name: entry.event_name,
+                        location: entry.location
+                    }));
+                } else if (entry.repeating === 'Everyweek' && startDateTime.getDay() >= startOfWeek.getDay() && startDateTime.getDay() <= endOfWeek.getDay()) {
+                    // Create an entry for the same day of each week
+                    return {
+                        dayOfWeek: startDateTime.getDay(),
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
+                        event_name: entry.event_name,
+                        location: entry.location
+                    };
+                } else {
+                    return {
+                        dayOfWeek: startDateTime.getDay(),
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
+                        event_name: entry.event_name,
+                        location: entry.location
+                    };
+                }
+            })
         };
-        console.log(`Transformed data: ${JSON.stringify(transformedData)}`);
+
         res.render('schedule', transformedData);
     })
 

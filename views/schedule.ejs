@@ -75,15 +75,57 @@
     color: #333;
     font-weight: bold;
   }
+  .week-navigation {
+  text-align: center;
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
+.sexy-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #fd8686;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.prev-button {
+  background-color: #91c9f9;
+}
+
+.next-button {
+  background-color: #a3eaae;
+}
+
+.sexy-button:hover {
+  background-color: #e05151;
+  transform: scale(1.05);
+}
+
+.sexy-button:active {
+  background-color: #ca4949;
+  transform: scale(0.98);
+}
+
+.sexy-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ca4949;
+}
+
+
   </style>
   
 </head>
 <body>
   <h1>Schedule for user <%= user_id %></h1>
   <div class="week-navigation">
-    <a href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
-    <a href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
-</div>
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
+  </div>
   <div class="table-container">
   <table>
     <thead>
