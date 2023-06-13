@@ -1,252 +1,339 @@
 {
     "openapi": "3.0.1",
     "info": {
-      "title": "User Management Plugin",
-      "description": "A plugin that allows for basic user operations like adding, fetching, and updating users.",
-      "version": "v1"
+        "title": "Schedule Management API",
+        "description": "API to manage user schedules and workout plans",
+        "version": "v1"
     },
     "servers": [
-      {
-        "url": "https://scary-fashion-eel.cyclic.app"
-      }
+        {
+            "url": "https://scary-fashion-eel.cyclic.app"
+        }
     ],
     "paths": {
-        "/addUser": {
+        "/addSchedule/{userid}": {
             "post": {
-                "operationId": "addUser",
-                "summary": "Add a new user, userid, email, name, and password must be provided by user, if not respond with a request asking for missing fields",
+                "operationId": "addSchedule",
+                "summary": "Add a new schedule",
+                "parameters": [
+                    {
+                        "name": "userid",
+                        "in": "path",
+                        "required": true,
+                        "description": "User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "requestBody": {
-                    "description": "User to be added",
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/User"
+                                "$ref": "#/components/schemas/Schedule"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    "201": {
+                        "description": "Schedule created"
                     },
                     "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 }
             }
         },
-        "/getUser/{userid}": {
-            "get": {
-                "operationId": "getUser",
-                "summary": "Get a user by id, make sure id is provided by user (dont assume an id) if user does not exist, respond with a request asking for a valid user id or ask if they want to register a new user",
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "userid",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "description": "The ID of the user."
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/updateUser/{userid}": {
+        "/updateSchedule/{userid}/{scheduleid}": {
             "put": {
-                "operationId": "updateUser",
-                "summary": "Update an existing user",
+                "operationId": "updateSchedule",
+                "summary": "Update an existing schedule",
                 "parameters": [
                     {
-                        "in": "path",
                         "name": "userid",
+                        "in": "path",
+                        "required": true,
+                        "description": "User ID",
                         "schema": {
                             "type": "string"
-                        },
+                        }
+                    },
+                    {
+                        "name": "scheduleid",
+                        "in": "path",
                         "required": true,
-                        "description": "The ID of the user."
+                        "description": "Schedule ID",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "requestBody": {
-                    "description": "Updated user fields",
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/User"
+                                "$ref": "#/components/schemas/Schedule"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Schedule updated"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/deleteSchedule/{userid}/{scheduleid}": {
+            "delete": {
+                "operationId": "deleteSchedule",
+                "summary": "Delete an existing schedule",
+                "parameters": [
+                    {
+                        "name": "userid",
+                        "in": "path",
+                        "required": true,
+                        "description": "User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "scheduleid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Schedule ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schedule deleted"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/getSchedule/{userid}/{scheduleid}": {
+            "get": {
+                "operationId": "getSchedule",
+                "summary": "Retrieve a schedule",
+                "parameters": [
+                    {
+                        "name": "userid",
+                        "in": "path",
+                        "required": true,
+                        "description": "User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "scheduleid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Schedule ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schedule retrieved",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
+                                    "$ref": "#/components/schemas/Schedule"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/getSchedules/{userid}": {
+            "get": {
+                "operationId": "getSchedules",
+                "summary": "Retrieve all schedules for a user",
+                "parameters": [
+                    {
+                        "name": "userid",
+                        "in": "path",
+                        "required": true,
+                        "description": "User ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Schedules retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Schedule"
                                     }
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 }
             }
         },
-      "/deleteUser/{userid}": {
-        "delete": {
-          "operationId": "deleteUser",
-          "summary": "Delete a user from the database",
-          "parameters": [
-            {
-              "in": "path",
-              "name": "userid",
-              "schema": {
-                "type": "string"
-              },
-              "required": true,
-              "description": "The ID of the user to be deleted."
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "OK",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad Request",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "error": {
-                        "type": "string"
-                      }
+        "/addWorkoutPlanToSchedule/{scheduleid}/{workoutid}": {
+            "post": {
+                "operationId": "addWorkoutPlanToSchedule",
+                "summary": "Add a workout plan to a schedule",
+                "parameters": [
+                    {
+                        "name": "scheduleid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Schedule ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "workoutid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Workout Plan ID",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
-                  }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Workout plan added to schedule"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
                 }
-              }
             }
-          }
+        },
+        "/removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}": {
+            "delete": {
+                "operationId": "removeWorkoutPlanFromSchedule",
+                "summary": "Remove a workout plan from a schedule",
+                "parameters": [
+                    {
+                        "name": "scheduleid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Schedule ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "workoutid",
+                        "in": "path",
+                        "required": true,
+                        "description": "Workout Plan ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Workout plan removed from schedule"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
         }
-      }
     },
-      "components": {
+    "components": {
         "schemas": {
-            "User": {
+            "Schedule": {
                 "type": "object",
                 "properties": {
-                    "userid": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
+                    "scheduleid": {
                         "type": "string",
-                        "format": "email"
+                        "description": "Schedule ID"
                     },
-                    "password": {
-                        "type": "string"
+                    "userid": {
+                        "type": "string",
+                        "description": "User ID"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the schedule"
+                    },
+                    "startDateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Start date and time of the schedule"
+                    },
+                    "endDateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "End date and time of the schedule"
+                    },
+                    "location": {
+                        "type": "string",
+                        "description": "Location of the schedule"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of the schedule"
                     }
                 },
-                "required": ["userid", "name", "email", "password"]
-            },
-            "Error": {
-              "type": "object",
-              "properties": {
-                  "errorcode": {
-                      "type": "string"
-                  },
-                  "message": {
-                      "type": "string"
-                  }
-              },
-              "required": ["errorcode", "message"]
-          }
+                "required": [
+                    "scheduleid",
+                    "userid",
+                    "title",
+                    "startDateTime",
+                    "endDateTime"
+                ]
+            }
         }
     }
-  }
+}
