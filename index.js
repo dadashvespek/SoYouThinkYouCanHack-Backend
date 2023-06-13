@@ -15,50 +15,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-//add user
-app.post('/addUser', async (req, res) => {
-  const requiredFields = [ 'email', 'password']; // replace with your actual required fields
-  const userData = req.body;
-  
-  // check if all required fields are present
-  let missingFields = requiredFields.filter(field => !(field in userData));
-  
-  if (missingFields.length > 0) {
-      return res.status(400).json({ error: `Fields missing: ${missingFields.join(', ')}` });
-  }
 
-  // If all required fields are present, proceed with the insert operation
-  const { data, error } = await supabase
-      .from('user_profile')
-      .insert([
-          { ...userData }
-      ]);
-  
-  if (error) return res.status(400).json({ error: error.message });
-  return res.status(200).json({ data });
-});
+// get schedule
 
-
-
-app.get('/getUser/:userid', async (req, res) => {
-    const userid = req.params.userid;
-    const { data, error } = await supabase
-        .from('user_profile')
-        .select('*')
-        .eq('userid', userid);
-    if (error) {
-        // Check if the error message indicates that the user doesn't exist
-        if (error.message.includes('relation "user_profile" does not exist')) {
-            return res.status(404).json({ error: `${userid} not found. respond by asking user if they would like to register (then you can use addUser to register them) or if they entered the wrong userid` });
-        } else {
-            return res.status(400).json({ error: error.message });
-        }
-    }
-    
-    return res.status(200).json({ data });
-});
-
-
+app.get("/:user/")
 
 
 
