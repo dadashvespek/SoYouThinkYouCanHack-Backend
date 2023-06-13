@@ -2,23 +2,21 @@
 <html>
 <head>
   <title>Weekly Schedule</title>
-  <style>
-    table {
-      width: 100%;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-  </style>
 </head>
 <body>
-  <div id="schedule"></div>
-  <button id="previousBtn">Previous Week</button>
-  <button id="nextBtn">Next Week</button>
-
-  <script>
-    src="script.js"
-  </script>
+  <div class="scheduler">
+    <button id="prevWeek">Previous Week</button>
+    <button id="nextWeek">Next Week</button>
+    <div id="weekDays">
+      <div id="monday"></div>
+      <div id="tuesday"></div>
+      <div id="wednesday"></div>
+      <div id="thursday"></div>
+      <div id="friday"></div>
+      <div id="saturday"></div>
+      <div id="sunday"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>

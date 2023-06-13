@@ -1,93 +1,53 @@
+import { createClient } from '@supabase/supabase-js';
 
-  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+// Initialize Supabase
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-  // Function to fetch schedule data for a given week
-  const fetchScheduleData = async (startOfWeek) => {
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 7);
-    
-    const { data, error } = await supabase
-      .from('your_table_name')
-      .select()
-      .gte('start_datetime', startOfWeek.toISOString())
-      .lte('end_datetime', endOfWeek.toISOString());
-      
-    if (error) {
-      console.error('Error fetching schedule data:', error);
-    }
-    
-    return data;
-  };
+// Constants for week navigation
+const oneWeek = 7 * 24 * 60 * 60 * 1000;
+let currentWeekStart = new Date();
+currentWeekStart.setHours(0, 0, 0, 0);
+currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay() + 1); // Set to the start of the current week
 
-  // Function to render the schedule
-  const renderSchedule = (scheduleData) => {
-    const scheduleContainer = document.getElementById('schedule');
-    scheduleContainer.innerHTML = ''; // Clear previous schedule
-    
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    
-    const table = document.createElement('table');
-    const headerRow = document.createElement('tr');
-    daysOfWeek.forEach((day) => {
-      const headerCell = document.createElement('th');
-      headerCell.textContent = day;
-      headerRow.appendChild(headerCell);
-    });
-    table.appendChild(headerRow);
-    
-    const scheduleRows = scheduleData.reduce((rows, event) => {
-      const startDateTime = new Date(event.start_datetime);
-      const endDateTime = new Date(event.end_datetime);
-      const startDay = startDateTime.getDay(); // 0 for Sunday, 1 for Monday, etc.
-      const endDay = endDateTime.getDay();
-      const rowSpan = endDay - startDay + 1;
-      
-      for (let i = 0; i < rowSpan; i++) {
-        const rowIndex = startDay + i;
-        if (!rows[rowIndex]) {
-          rows[rowIndex] = document.createElement('tr');
-        }
-        
-        const cell = document.createElement('td');
-        cell.textContent = event.event_name;
-        rows[rowIndex].appendChild(cell);
-        
-        // Apply additional styling if the event is repeating
-        if (event.repeating) {
-          cell.classList.add('repeating-event');
-        }
-      }
-      
-      return rows;
-    }, []);
-    
-    scheduleRows.forEach((row) => table.appendChild(row));
-    scheduleContainer.appendChild(table);
-  };
+// Event handlers for week navigation
+document.getElementById('prevWeek').addEventListener('click', () => {
+  currentWeekStart = new Date(currentWeekStart.getTime() - oneWeek);
+  renderWeek();
+});
 
-  // Function to handle previous week button click
-  const handlePreviousWeek = () => {
-    // Calculate the start date of the previous week
-    const currentWeekStart = new Date(); // Assuming the current week is displayed initially
-    const previousWeekStart = new Date(currentWeekStart);
-    previousWeekStart.setDate(currentWeekStart.getDate() - 7);
-    
-    fetchScheduleData(previousWeekStart).then(renderSchedule);
-  };
+document.getElementById('nextWeek').addEventListener('click', () => {
+  currentWeekStart = new Date(currentWeekStart.getTime() + oneWeek);
+  renderWeek();
+});
 
-  // Function to handle next week button click
-  const handleNextWeek = () => {
-    // Calculate the start date of the next week
-    const currentWeekStart = new Date(); // Assuming the current week is displayed initially
-    const nextWeekStart = new Date(currentWeekStart);
-    nextWeekStart.setDate(currentWeekStart.getDate() + 7);
-    
-    fetchScheduleData(nextWeekStart).then(renderSchedule);
-  };
+// Function to render the week's schedule
+async function renderWeek() {
+  // Clear the current schedule
+  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  days.forEach(day => document.getElementById(day).innerHTML = '');
 
-  // Attach event listeners to the buttons
-  document.getElementById('previousBtn').addEventListener('click', handlePreviousWeek);
-  document.getElementById('nextBtn').addEventListener('click', handleNextWeek);
+  // Query the database for events in the current week
+  const currentWeekEnd = new Date(currentWeekStart.getTime() + oneWeek);
+  const { data, error } = await supabase
+    .from('schedule')
+    .select('*')
+    .gte('start_datetime', currentWeekStart)
+    .lt('start_datetime', currentWeekEnd);
 
-  // Initially fetch and render the current week's schedule
-  fetchScheduleData(new Date()).then(renderSchedule);
+  if (error) {
+    console.error('Error fetching schedule:', error);
+    return;
+  }
+
+  // Add each event to the appropriate day
+  data.forEach(event => {
+    const dayOfWeek = new Date(event.start_datetime).getDay();
+    const dayElement = document.getElementById(days[dayOfWeek]);
+    const eventElement = document.createElement('div');
+    eventElement.innerText = `${event.event_name} at ${event.location} from ${event.start_datetime} to ${event.end_datetime}`;
+    dayElement.appendChild(eventElement);
+  });
+}
+
+// Initial render
+renderWeek();
