@@ -136,7 +136,7 @@
         "/getSchedule/{userid}/{scheduleid}": {
             "get": {
                 "operationId": "getSchedule",
-                "summary": "Retrieve a schedule, must provide scheduleid, if you dont have scheduleid use getSchedules",
+                "summary": "Retrieve a schedule, scheduleid is automatically generated, if not sure use getSchedules",
                 "parameters": [
                     {
                         "name": "userid",
