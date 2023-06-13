@@ -7,18 +7,17 @@ const path = require('path');
 // serve all static routes
 app.use(express.static(path.join(__dirname)));
 
+// Define the schedule route
+app.get('/schedule/:userId', (req, res) => {
+    res.sendFile(path.join(__dirname, 'schedule.html'));
+});
+
 // Create a Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 // Enable express to parse json and url-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-
-
-// get schedule
-
-app.get("/:user/")
 
 
 
