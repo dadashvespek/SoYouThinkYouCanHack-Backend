@@ -41,15 +41,27 @@ app.use(express.urlencoded({ extended: true }));
 
 //add user
 app.post('/addUser', async (req, res) => {
-    const userData = req.body;
-    const { data, error } = await supabase
-        .from('users')
-        .insert([
-            { ...userData }
-        ]);
-    if (error) return res.status(400).json({ error: error.message });
-    return res.status(200).json({ data });
+  const requiredFields = ['userid', 'email', 'password']; // replace with your actual required fields
+  const userData = req.body;
+  
+  // check if all required fields are present
+  let missingFields = requiredFields.filter(field => !(field in userData));
+  
+  if (missingFields.length > 0) {
+      return res.status(400).json({ error: `Fields missing: ${missingFields.join(', ')}` });
+  }
+
+  // If all required fields are present, proceed with the insert operation
+  const { data, error } = await supabase
+      .from('users')
+      .insert([
+          { ...userData }
+      ]);
+  
+  if (error) return res.status(400).json({ error: error.message });
+  return res.status(200).json({ data });
 });
+
 
 
 app.get('/getUser/:userid', async (req, res) => {
@@ -58,7 +70,15 @@ app.get('/getUser/:userid', async (req, res) => {
         .from('users')
         .select('*')
         .eq('userid', userid);
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+        // Check if the error message indicates that the user doesn't exist
+        if (error.message.includes('relation "users" does not exist')) {
+            return res.status(404).json({ error: `${userid} not registered. Ask user if they would like to register (then you can use addUser to register them)` });
+        } else {
+            return res.status(400).json({ error: error.message });
+        }
+    }
+    
     return res.status(200).json({ data });
 });
 
