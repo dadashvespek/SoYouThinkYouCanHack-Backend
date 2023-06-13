@@ -2,7 +2,7 @@
 	"schema_version": "v1",
 	"name_for_human": "Profile modifier/reader",
 	"name_for_model": "Profile modifier/reader",
-	"description_for_human": "Plugin for reading and planning your profile",
+	"description_for_human": "Plugin for reading and planning  profile",
 	"description_for_model": "Use the Profile modifier/reader plugin to read and plan user profile",
 	"api": {
 		"type": "openapi",
