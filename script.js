@@ -1,91 +1,99 @@
+const { createClient } = require('@supabase/supabase-js');
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-let currentWeekStart = getStartOfWeek(new Date());
 
-function getStartOfWeek(date) {
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6:1); // adjust when day is Sunday
-    return new Date(date.setDate(diff));
-}
+async function fetchSchedule(userId) {
+    // Get the current week range
+    let now = new Date();
+    let firstDay = new Date(now.setDate(now.getDate() - now.getDay()));
+    let lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 6));
 
-
-document.getElementById('prevWeek').addEventListener('click', () => {
-    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
-    fetchSchedule();
-});
-
-document.getElementById('nextWeek').addEventListener('click', () => {
-    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
-    fetchSchedule();
-});
-
-async function fetchSchedule() {
-    const userId = window.location.pathname.split('/').pop();
-    const currentWeekEnd = new Date(currentWeekStart);
-    currentWeekEnd.setDate(currentWeekEnd.getDate() + 7);
-
-    const { data: scheduleData, error: scheduleError } = await supabase
+    // Fetch the schedule from Supabase
+    let { data: events, error } = await supabase
         .from('schedules')
         .select('*')
         .eq('user_id', userId)
-        .gte('start_datetime', currentWeekStart)
-        .lte('end_datetime', currentWeekEnd);
-    if (scheduleError) {
-        console.log('Error: ', scheduleError);
+        .gte('start_datetime', firstDay)
+        .lte('end_datetime', lastDay);
+        
+    if(error) {
+        console.error("Error fetching schedule", error);
+        throw error;
     }
+    
+    // Organize the events into a suitable data structure
+    let organizedEvents = organizeEvents(events);
 
-    const { data: repeatData, error: repeatError } = await supabase
-        .from('schedules')
-        .select('*')
-        .eq('user_id', userId)
-        .in('repeating', ['Everyday', 'Everyweek']);
-    if (repeatError) {
-        console.log('Error: ', repeatError);
-    }
+    // Generate the HTML of the schedule
+    let scheduleHTML = generateScheduleHTML(organizedEvents);
 
-    let data = [];
-    if (scheduleData) data = [...data, ...scheduleData];
-    if (repeatData) data = [...data, ...repeatData];
-    renderSchedule(data);
+    return scheduleHTML;
 }
 
+function organizeEvents(events) {
+    const organizedEvents = {};
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    daysOfWeek.forEach(day => {
+        organizedEvents[day] = {};
+        for (let hour = 0; hour < 24; hour++) {
+            organizedEvents[day][hour] = [];
+        }
+    });
 
-function renderSchedule(events) {
-    const scheduleTable = document.getElementById('schedule');
-    scheduleTable.innerHTML = '';
+    events.forEach(event => {
+        const startDay = daysOfWeek[new Date(event.start_datetime).getDay()];
+        const endDay = daysOfWeek[new Date(event.end_datetime).getDay()];
+        const startHour = new Date(event.start_datetime).getHours();
+        const endHour = new Date(event.end_datetime).getHours();
 
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    let table = '<tr><th>Time</th>';
-
-    // Create table header
-    for (let i = 0; i < 7; i++) {
-        table += `<th>${daysOfWeek[i]}</th>`;
-    }
-    table += '</tr>';
-
-    // Create rows for each hour of each day
-    for (let hour = 0; hour < 24; hour++) {
-        table += `<tr><td>${hour}:00 - ${hour + 1}:00</td>`;
-        for (let day = 0; day < 7; day++) {
-            const event = events.find(e => {
-                const startDay = e.start_datetime.getDay();
-                const endDay = e.end_datetime.getDay();
-                const startHour = e.start_datetime.getHours();
-                const endHour = e.end_datetime.getHours();
-
-                return ((e.repeating === 'Everyday') || 
-                        (e.repeating === 'Everyweek' && startDay === day) || 
-                        (startDay === day && startHour <= hour && endHour > hour));
+        if (event.repeating === 'Everyday') {
+            daysOfWeek.forEach(day => {
+                for (let hour = startHour; hour <= endHour; hour++) {
+                    organizedEvents[day][hour].push(event);
+                }
             });
-            if (event) {
-                table += `<td>${event.event_name}<br>${event.location}</td>`;
-            } else {
-                table += '<td></td>';
+        } else if (event.repeating === 'Everyweek' && startDay === endDay) {
+            for (let hour = startHour; hour <= endHour; hour++) {
+                organizedEvents[startDay][hour].push(event);
+            }
+        } else {
+            for (let hour = startHour; hour <= endHour; hour++) {
+                organizedEvents[startDay][hour].push(event);
             }
         }
-        table += '</tr>';
-    }
+    });
 
-    scheduleTable.innerHTML = table;
+    return organizedEvents;
 }
 
-fetchSchedule();
+function generateScheduleHTML(organizedEvents) {
+    let scheduleHTML = '<table><tr><th>Time/Day</th>';
+    const daysOfWeek = Object.keys(organizedEvents);
+
+    daysOfWeek.forEach(day => {
+        scheduleHTML += `<th>${day}</th>`;
+    });
+
+    scheduleHTML += '</tr>';
+
+    for (let hour = 0; hour < 24; hour++) {
+        scheduleHTML += `<tr><td>${hour}:00 - ${hour+1}:00</td>`;
+
+        daysOfWeek.forEach(day => {
+            scheduleHTML += '<td>';
+            organizedEvents[day][hour].forEach(event => {
+                scheduleHTML += `<p>${event.event_name} - ${event.location}</p>`;
+            });
+            scheduleHTML += '</td>';
+        });
+
+        scheduleHTML += '</tr>';
+    }
+
+    scheduleHTML += '</table>';
+
+    return scheduleHTML;
+}
+
+module.exports = { fetchSchedule };
