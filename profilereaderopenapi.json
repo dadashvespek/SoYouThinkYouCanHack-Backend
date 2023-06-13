@@ -1,0 +1,252 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "User Management Plugin",
+      "description": "A plugin that allows for basic user operations like adding, fetching, and updating users.",
+      "version": "v1"
+    },
+    "servers": [
+      {
+        "url": "https://scary-fashion-eel.cyclic.app"
+      }
+    ],
+    "paths": {
+        "/addUser": {
+            "post": {
+                "operationId": "addUser",
+                "summary": "Add a new user",
+                "requestBody": {
+                    "description": "User to be added",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/getUser/{userid}": {
+            "get": {
+                "operationId": "getUser",
+                "summary": "Get a user by ID",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userid",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "The ID of the user."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/updateUser/{userid}": {
+            "put": {
+                "operationId": "updateUser",
+                "summary": "Update an existing user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userid",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "description": "The ID of the user."
+                    }
+                ],
+                "requestBody": {
+                    "description": "Updated user fields",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+      "/deleteUser/{userid}": {
+        "delete": {
+          "operationId": "deleteUser",
+          "summary": "Delete a user from the database",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userid",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "The ID of the user to be deleted."
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad Request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+      "components": {
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "userid": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": ["userid", "name", "email", "password"]
+            },
+            "Error": {
+              "type": "object",
+              "properties": {
+                  "errorcode": {
+                      "type": "string"
+                  },
+                  "message": {
+                      "type": "string"
+                  }
+              },
+              "required": ["errorcode", "message"]
+          }
+        }
+    }
+  }
