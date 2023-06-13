@@ -136,7 +136,7 @@
         "/getSchedule/{userid}/{scheduleid}": {
             "get": {
                 "operationId": "getSchedule",
-                "summary": "Retrieve a schedule",
+                "summary": "Retrieve a schedule, must provide scheduleid, if you dont have scheduleid use getSchedules",
                 "parameters": [
                     {
                         "name": "userid",
@@ -309,12 +309,12 @@
                     },
                     "startDateTime": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": "date-time YYYY-MM-DDTHH:MM:SSZ",
                         "description": "Start date and time of the schedule"
                     },
                     "endDateTime": {
                         "type": "string",
-                        "format": "date-time",
+                        "format": "date-time YYYY-MM-DDTHH:MM:SSZ",
                         "description": "End date and time of the schedule"
                     },
                     "location": {
