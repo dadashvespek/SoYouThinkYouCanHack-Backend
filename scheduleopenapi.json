@@ -1,327 +1,332 @@
 {
-    "openapi": "3.0.1",
-    "info": {
-      "title": "Schedule Management API",
-      "description": "API to manage user schedules and workout plans",
-      "version": "v1"
-    },
-    "servers": [
-      {
-        "url": "https://scary-fashion-eel.cyclic.app"
-      }
-    ],
-    "paths": {
-      "/addSchedule/{userid}": {
-        "post": {
-          "summary": "Add a new schedule",
-          "parameters": [
-            {
-              "name": "userid",
-              "in": "path",
-              "required": true,
-              "description": "User ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Schedule"
-                }
-              }
-            },
-            "required": true
-          },
-          "responses": {
-            "201": {
-              "description": "Schedule created"
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/updateSchedule/{userid}/{scheduleid}": {
-        "put": {
-          "summary": "Update an existing schedule",
-          "parameters": [
-            {
-              "name": "userid",
-              "in": "path",
-              "required": true,
-              "description": "User ID",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleid",
-              "in": "path",
-              "required": true,
-              "description": "Schedule ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Schedule"
-                }
-              }
-            },
-            "required": true
-          },
-          "responses": {
-            "200": {
-              "description": "Schedule updated"
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/deleteSchedule/{userid}/{scheduleid}": {
-        "delete": {
-          "summary": "Delete an existing schedule",
-          "parameters": [
-            {
-              "name": "userid",
-              "in": "path",
-              "required": true,
-              "description": "User ID",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleid",
-              "in": "path",
-              "required": true,
-              "description": "Schedule ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Schedule deleted"
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/getSchedule/{userid}/{scheduleid}": {
-        "get": {
-          "summary": "Retrieve a schedule",
-          "parameters": [
-            {
-              "name": "userid",
-              "in": "path",
-              "required": true,
-              "description": "User ID",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "scheduleid",
-              "in": "path",
-              "required": true,
-              "description": "Schedule ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Schedule retrieved",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Schedule"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/getSchedules/{userid}": {
-        "get": {
-          "summary": "Retrieve all schedules for a user",
-          "parameters": [
-            {
-              "name": "userid",
-              "in": "path",
-              "required": true,
-              "description": "User ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Schedules retrieved",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Schedule"
-                    }
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/addWorkoutPlanToSchedule/{scheduleid}/{workoutid}": {
-        "post": {
-          "summary": "Add a workout plan to a schedule",
-          "parameters": [
-            {
-              "name": "scheduleid",
-              "in": "path",
-              "required": true,
-              "description": "Schedule ID",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "workoutid",
-              "in": "path",
-              "required": true,
-              "description": "Workout Plan ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "201": {
-              "description": "Workout plan added to schedule"
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      },
-      "/removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}": {
-        "delete": {
-          "summary": "Remove a workout plan from a schedule",
-          "parameters": [
-            {
-              "name": "scheduleid",
-              "in": "path",
-              "required": true,
-              "description": "Schedule ID",
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "workoutid",
-              "in": "path",
-              "required": true,
-              "description": "Workout Plan ID",
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Workout plan removed from schedule"
-            },
-            "400": {
-              "description": "Bad request"
-            },
-            "500": {
-              "description": "Server error"
-            }
-          }
-        }
-      }
-    },
-    "components": {
-      "schemas": {
-        "Schedule": {
-          "type": "object",
-          "properties": {
-            "scheduleid": {
-              "type": "string",
-              "description": "Schedule ID"
-            },
-            "userid": {
-              "type": "string",
-              "description": "User ID"
-            },
-            "title": {
-              "type": "string",
-              "description": "Title of the schedule"
-            },
-            "startDateTime": {
-              "type": "string",
-              "format": "date-time",
-              "description": "Start date and time of the schedule"
-            },
-            "endDateTime": {
-              "type": "string",
-              "format": "date-time",
-              "description": "End date and time of the schedule"
-            },
-            "location": {
-              "type": "string",
-              "description": "Location of the schedule"
-            },
-            "description": {
-              "type": "string",
-              "description": "Description of the schedule"
-            }
-          },
-          "required": ["scheduleid", "userid", "title", "startDateTime", "endDateTime"]
-        }
-      }
-    }
-  }
-  
+	"openapi":"3.0.1",
+	"info":{
+		"title":"Schedule Management API",
+		"description":"API to manage user schedules and workout plans",
+		"version":"v1"
+	},
+	"servers":[
+		{
+			"url":"https://scary-fashion-eel.cyclic.app"
+		}
+	],
+	"paths":{
+		"/addSchedule/{userid}":{
+			"post":{
+				"summary":"Add a new schedule",
+				"parameters":[
+					{
+						"name":"userid",
+						"in":"path",
+						"required":true,
+						"description":"User ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"requestBody":{
+					"content":{
+						"application/json":{
+							"schema":{
+								"$ref":"#/components/schemas/Schedule"
+							}
+						}
+					},
+					"required":true
+				},
+				"responses":{
+					"201":{
+						"description":"Schedule created"
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/updateSchedule/{userid}/{scheduleid}":{
+			"put":{
+				"summary":"Update an existing schedule",
+				"parameters":[
+					{
+						"name":"userid",
+						"in":"path",
+						"required":true,
+						"description":"User ID",
+						"schema":{
+							"type":"string"
+						}
+					},
+					{
+						"name":"scheduleid",
+						"in":"path",
+						"required":true,
+						"description":"Schedule ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"requestBody":{
+					"content":{
+						"application/json":{
+							"schema":{
+								"$ref":"#/components/schemas/Schedule"
+							}
+						}
+					},
+					"required":true
+				},
+				"responses":{
+					"200":{
+						"description":"Schedule updated"
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/deleteSchedule/{userid}/{scheduleid}":{
+			"delete":{
+				"summary":"Delete an existing schedule",
+				"parameters":[
+					{
+						"name":"userid",
+						"in":"path",
+						"required":true,
+						"description":"User ID",
+						"schema":{
+							"type":"string"
+						}
+					},
+					{
+						"name":"scheduleid",
+						"in":"path",
+						"required":true,
+						"description":"Schedule ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"responses":{
+					"200":{
+						"description":"Schedule deleted"
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/getSchedule/{userid}/{scheduleid}":{
+			"get":{
+				"summary":"Retrieve a schedule",
+				"parameters":[
+					{
+						"name":"userid",
+						"in":"path",
+						"required":true,
+						"description":"User ID",
+						"schema":{
+							"type":"string"
+						}
+					},
+					{
+						"name":"scheduleid",
+						"in":"path",
+						"required":true,
+						"description":"Schedule ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"responses":{
+					"200":{
+						"description":"Schedule retrieved",
+						"content":{
+							"application/json":{
+								"schema":{
+									"$ref":"#/components/schemas/Schedule"
+								}
+							}
+						}
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/getSchedules/{userid}":{
+			"get":{
+				"summary":"Retrieve all schedules for a user",
+				"parameters":[
+					{
+						"name":"userid",
+						"in":"path",
+						"required":true,
+						"description":"User ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"responses":{
+					"200":{
+						"description":"Schedules retrieved",
+						"content":{
+							"application/json":{
+								"schema":{
+									"type":"array",
+									"items":{
+										"$ref":"#/components/schemas/Schedule"
+									}
+								}
+							}
+						}
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/addWorkoutPlanToSchedule/{scheduleid}/{workoutid}":{
+			"post":{
+				"summary":"Add a workout plan to a schedule",
+				"parameters":[
+					{
+						"name":"scheduleid",
+						"in":"path",
+						"required":true,
+						"description":"Schedule ID",
+						"schema":{
+							"type":"string"
+						}
+					},
+					{
+						"name":"workoutid",
+						"in":"path",
+						"required":true,
+						"description":"Workout Plan ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"responses":{
+					"201":{
+						"description":"Workout plan added to schedule"
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		},
+		"/removeWorkoutPlanFromSchedule/{scheduleid}/{workoutid}":{
+			"delete":{
+				"summary":"Remove a workout plan from a schedule",
+				"parameters":[
+					{
+						"name":"scheduleid",
+						"in":"path",
+						"required":true,
+						"description":"Schedule ID",
+						"schema":{
+							"type":"string"
+						}
+					},
+					{
+						"name":"workoutid",
+						"in":"path",
+						"required":true,
+						"description":"Workout Plan ID",
+						"schema":{
+							"type":"string"
+						}
+					}
+				],
+				"responses":{
+					"200":{
+						"description":"Workout plan removed from schedule"
+					},
+					"400":{
+						"description":"Bad request"
+					},
+					"500":{
+						"description":"Server error"
+					}
+				}
+			}
+		}
+	},
+	"components":{
+		"schemas":{
+			"Schedule":{
+				"type":"object",
+				"properties":{
+					"scheduleid":{
+						"type":"string",
+						"description":"Schedule ID"
+					},
+					"userid":{
+						"type":"string",
+						"description":"User ID"
+					},
+					"title":{
+						"type":"string",
+						"description":"Title of the schedule"
+					},
+					"startDateTime":{
+						"type":"string",
+						"format":"date-time",
+						"description":"Start date and time of the schedule"
+					},
+					"endDateTime":{
+						"type":"string",
+						"format":"date-time",
+						"description":"End date and time of the schedule"
+					},
+					"location":{
+						"type":"string",
+						"description":"Location of the schedule"
+					},
+					"description":{
+						"type":"string",
+						"description":"Description of the schedule"
+					}
+				},
+				"required":[
+					"scheduleid",
+					"userid",
+					"title",
+					"startDateTime",
+					"endDateTime"
+				]
+			}
+		}
+	}
+}
