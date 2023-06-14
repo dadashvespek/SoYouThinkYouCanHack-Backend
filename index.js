@@ -47,34 +47,37 @@ app.route('/schedule/:user_id/:weekOffset?')
             schedule: weekData.flatMap(entry => {
                 const startDateTime = new Date(entry.start_datetime);
                 const endDateTime = new Date(entry.end_datetime);
+                const duration = (endDateTime - startDateTime) / (60 * 60 * 1000); // in hours
+
+                let blocks = [];
+                for(let i = 0; i < duration; ) {
+                    const blockDuration = Math.min(4, duration - i);
+                    blocks.push({
+                        dayOfWeek: startDateTime.getDay(),
+                        startHour: startDateTime.getHours() + i,
+                        endHour: startDateTime.getHours() + i + blockDuration,
+                        duration: blockDuration,
+                        event_name: entry.event_name,
+                        location: entry.location
+                    });
+                    i += blockDuration;
+                }
+                
                 if (entry.repeating === 'Everyday') {
                     // Create an entry for each day of the week
-                    return Array(7).fill().map((_, dayOfWeek) => ({
-                        dayOfWeek: dayOfWeek,
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
-                        event_name: entry.event_name,
-                        location: entry.location
-                    }));
+                    return Array(7).fill().map((_, dayOfWeek) => {
+                        return blocks.map(block => ({
+                            ...block,
+                            dayOfWeek: dayOfWeek,
+                        }));
+                    }).flat();
                 } else if (entry.repeating === 'Everyweek' && startDateTime.getDay() >= startOfWeek.getDay() && startDateTime.getDay() <= endOfWeek.getDay()) {
                     // Create an entry for the same day of each week
-                    return {
-                        dayOfWeek: startDateTime.getDay(),
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
-                        event_name: entry.event_name,
-                        location: entry.location
-                    };
+                    return blocks;
                 } else {
-                    return {
-                        dayOfWeek: startDateTime.getDay(),
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
-                        event_name: entry.event_name,
-                        location: entry.location
-                    };
+                    return blocks;
                 }
-            })
+            }).flat()
         };
 
         res.render('schedule', transformedData);

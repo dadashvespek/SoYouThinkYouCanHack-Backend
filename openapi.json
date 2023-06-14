@@ -14,7 +14,7 @@
       "/data/{user_id}": {
         "get": {
           "operationId": "getSchedule",
-          "summary": "Fetch and filter user data",
+          "summary": "Fetch and filter user data, if user proivded a time reference (eg: yesterday, or tomorrow) it will be used as a reference for the start and end datetime.",
           "parameters": [
             {
               "in": "path",
