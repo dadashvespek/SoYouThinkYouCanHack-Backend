@@ -6,6 +6,33 @@ const path = require('path');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname)));
+const consolidateData = (data) => {
+    // Group events
+    const groupedData = {};
+    data.forEach(entry => {
+        const key = `${entry.event_name}@${entry.location}@${entry.startHour}@${entry.endHour}`;
+        if (groupedData[key]) {
+            groupedData[key].push(entry.dayOfWeek);
+        } else {
+            groupedData[key] = [entry.dayOfWeek];
+        }
+    });
+
+    // Format and condense the data
+    const consolidatedData = Object.keys(groupedData).map(key => {
+        const [event_name, location, startHour, endHour] = key.split('@');
+        const daysOfWeek = groupedData[key];
+        return {
+            event_name,
+            location,
+            time: `${startHour}:00 - ${endHour}:00`,
+            daysOfWeek: daysOfWeek.sort(),  // Sort days for consistent order
+            repeat: daysOfWeek.length > 1
+        };
+    });
+
+    return consolidatedData;
+};
 app.route('/schedule/:user_id/:weekOffset?')
     .get(async (req, res) => {
         const user_id = req.params.user_id;
@@ -134,7 +161,9 @@ app.route('/schedule/:user_id/:weekOffset?')
             return true;
         });
     
-        res.json(filteredData);
+        const consolidatedData = consolidateData(filteredData);
+
+        res.json(consolidatedData);
     });
     
 app.listen(3000, function () {
