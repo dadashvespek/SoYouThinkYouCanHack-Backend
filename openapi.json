@@ -87,6 +87,10 @@
           "items": {
             "type": "object",
             "properties": {
+              "user_id": {
+                "type": "string",
+                "description": "The ID of the user."
+              },
               "start_datetime": {
                 "type": "string",
                 "format": "date-time",
