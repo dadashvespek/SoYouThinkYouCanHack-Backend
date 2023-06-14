@@ -127,7 +127,8 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 app.get("/data/:user_id", async (req, res) => {
     const user_id = req.params.user_id;
   
-
+    // Parse the query parameters
+    const { start_datetime, end_datetime, location } = req.query;
   
     // Build the query
     let query = supabase
@@ -161,58 +162,65 @@ app.get("/data/:user_id", async (req, res) => {
     }
 
   // Parse the query parameters
-  const { start_datetime, end_datetime, location } = req.query;
+
   console.log(
     `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
   );
+  // Filter the data based on the query parameters
+  const filteredData = data.filter((entry) => {
+    // Default to today's date if date is not provided
+    const currentDateTime = new Date();
+    const currentDate = currentDateTime.toISOString().split("T")[0];
 
+    let startDateTime = new Date(entry.start_datetime);
+    let endDateTime = new Date(entry.end_datetime);
 
-// Replace slashes with dashes in the date strings
-let startDatetime = start_datetime ? start_datetime.replace(/\//g, '-') : null;
-let endDatetime = end_datetime ? end_datetime.replace(/\//g, '-') : null;
+    // Check if the date and time are in the correct format
+    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
 
-// Check if the date strings include a time
-const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+    // If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${start_datetime}T00:00:00`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${end_datetime}T23:59:59`);
+    }
 
-// If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
-if (startDatetime && !datetimeRegex.test(startDatetime)) {
-  startDatetime += 'T00:00:00';
-}
-if (endDatetime && !datetimeRegex.test(endDatetime)) {
-  endDatetime += 'T23:59:59';
-}
+    // If a start or end datetime is given but it doesn't contain a date, assume it's today's date
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${currentDate}T${start_datetime}`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${currentDate}T${end_datetime}`);
+    }
 
-// Parse the date strings into Date objects
-const windowStart = startDatetime ? new Date(startDatetime) : null;
-const windowEnd = endDatetime ? new Date(endDatetime) : null;
+    // Check if entry falls within the datetime window
+    if (start_datetime && end_datetime) {
+      const windowStart = new Date(start_datetime);
+      const windowEnd = new Date(end_datetime);
+      if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
+        return false;
+      }
+    } else if (start_datetime) {
+      const windowStart = new Date(start_datetime);
+      if (!(startDateTime >= windowStart)) {
+        return false;
+      }
+    } else if (end_datetime) {
+      const windowEnd = new Date(end_datetime);
+      if (!(endDateTime <= windowEnd)) {
+        return false;
+      }
+    }
 
-// Filter the data based on the query parameters
-const filteredData = data.filter((entry) => {
-  let startDateTime = new Date(entry.start_datetime);
-  let endDateTime = new Date(entry.end_datetime);
-
-  // Check if entry falls within the datetime window
-  if (windowStart && windowEnd) {
-    if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
+    // Check if entry matches the given location
+    if (location && entry.location !== location) {
       return false;
     }
-  } else if (windowStart) {
-    if (!(startDateTime >= windowStart)) {
-      return false;
-    }
-  } else if (windowEnd) {
-    if (!(endDateTime <= windowEnd)) {
-      return false;
-    }
-  }
 
-  // Check if entry matches the given location
-  if (location && entry.location !== location) {
-    return false;
-  }
+    return true;
+  });
 
-  return true;
-});
   const consolidatedData = {};
 
   filteredData.forEach((entry) => {
