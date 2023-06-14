@@ -125,26 +125,44 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 });
 
 app.get("/data/:user_id", async (req, res) => {
-  const user_id = req.params.user_id;
-
-  // Fetch the data from Supabase
-  let { data, error } = await supabase
-    .from("schedules")
-    .select("*")
-    .eq("user_id", user_id);
-
-  if (error) {
-    res.status(500).json({ error: "Failed to fetch data from Supabase" });
-    return;
-  }
-
-  if (!data) {
-    res.json({});
-    return;
-  }
+    const user_id = req.params.user_id;
+  
+    // Parse the query parameters
+    const { start_datetime, end_datetime, location } = req.query;
+  
+    // Build the query
+    let query = supabase
+      .from("schedules")
+      .select("*")
+      .eq("user_id", user_id);
+  
+    if (start_datetime) {
+      query = query.gte("start_datetime", start_datetime);
+    }
+  
+    if (end_datetime) {
+      query = query.lte("end_datetime", end_datetime);
+    }
+  
+    if (location) {
+      query = query.eq("location", location);
+    }
+  
+    // Fetch the data from Supabase
+    let { data, error } = await query;
+  
+    if (error) {
+      res.status(500).json({ error: "Failed to fetch data from Supabase" });
+      return;
+    }
+  
+    if (!data) {
+      res.json({});
+      return;
+    }
 
   // Parse the query parameters
-  const { start_datetime, end_datetime, location } = req.query;
+
   console.log(
     `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
   );
