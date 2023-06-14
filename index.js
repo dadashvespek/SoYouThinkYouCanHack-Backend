@@ -134,37 +134,7 @@ app.route('/schedule/:user_id/:weekOffset?')
             return true;
         });
     
-        const consolidatedData = {};
-
-        filteredData.forEach(entry => {
-            const startDateTime = new Date(entry.start_datetime);
-            const endDateTime = new Date(entry.end_datetime);
-    
-            const date = startDateTime.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
-            const startTime = startDateTime.getHours();
-            const endTime = endDateTime.getHours();
-    
-            if (!consolidatedData[date]) {
-                consolidatedData[date] = [];
-            }
-    
-            consolidatedData[date].push({
-                startTime,
-                endTime,
-                eventName: entry.event_name,
-                location: entry.location,
-            });
-        });
-    
-        // Convert consolidatedData into a more readable format
-        const result = Object.entries(consolidatedData).map(([date, events]) => {
-            const eventSummaries = events.map(event => {
-                return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
-            });
-            return `${date}: ${eventSummaries.join(', ')}`;
-        });
-    
-        res.json(result);
+        res.json(filteredData);
     });
     
 app.listen(3000, function () {
