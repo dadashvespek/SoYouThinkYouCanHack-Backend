@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
+const path = require('path');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname)));
 app.route('/schedule/:user_id/:weekOffset?')
     .get(async (req, res) => {
         const user_id = req.params.user_id;
