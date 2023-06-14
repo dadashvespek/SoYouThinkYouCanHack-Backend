@@ -1,9 +1,9 @@
 {
 	"schema_version": "v1",
-	"name_for_human": "User Data Fetcher Plugin",
-	"name_for_model": "data_fetcher",
+	"name_for_human": "Scheduler Plugin",
+	"name_for_model": "Schedule data_fetcher Plugin",
 	"description_for_human": "Plugin for fetching and filtering user data based on the provided parameters such as start and end datetime, and location.",
-	"description_for_model": "Use the Data Fetcher plugin to fetch and filter user data. Provide the user ID and optional parameters like start and end datetime, and location, and the plugin will return the filtered data.",
+	"description_for_model": "To use the Schedule data_fetcher Plugin, identify the user's intent to fetch data related to a specific user ID. The user may provide additional filters to narrow down the data. If the user specifies a starting datetime, fetch data from that datetime onwards. If the user specifies an ending datetime, fetch data up to that datetime. If both a start and end datetime are specified, fetch data within this window. If a location is specified, further filter the data to only include entries with that location. The query structure for the plugin follows this pattern: '/data/{user_id}?start_datetime={start_datetime}&end_datetime={end_datetime}&location={location}'. Each query parameter is optional, allowing for flexible usage depending on the user's request.",
 	"api": {
 		"type": "openapi",
 		"url": "https://scary-fashion-eel.cyclic.app/openapi.json",
