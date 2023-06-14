@@ -13,7 +13,7 @@
     "paths": {
       "/data/{user_id}": {
         "get": {
-          "operationId": "getUserData",
+          "operationId": "getUserScheduleData",
           "summary": "Fetch and filter user data",
           "parameters": [
             {
