@@ -78,7 +78,63 @@ app.route('/schedule/:user_id/:weekOffset?')
         res.render('schedule', transformedData);
     })
 
-
+    app.get('/data/:user_id', async (req, res) => {
+        const user_id = req.params.user_id;
+    
+        // Fetch the data from Supabase
+        let { data, error } = await supabase
+            .from('schedules')
+            .select('*')
+            .eq('user_id', user_id);
+        
+        if (error) {
+            res.status(500).json({ error: 'Failed to fetch data from Supabase' });
+            return;
+        }
+    
+        if (!data) {
+            res.json({});
+            return;
+        }
+    
+        // Parse the query parameters
+        const { start_datetime, end_datetime, location } = req.query;
+    
+        // Filter the data based on the query parameters
+        const filteredData = data.filter(entry => {
+            const startDateTime = new Date(entry.start_datetime);
+            const endDateTime = new Date(entry.end_datetime);
+    
+            // Check if entry falls within the datetime window
+            if (start_datetime && end_datetime) {
+                const windowStart = new Date(start_datetime);
+                const windowEnd = new Date(end_datetime);
+                if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
+                    return false;
+                }
+            } else if (start_datetime) {
+                const windowStart = new Date(start_datetime);
+                if (!(startDateTime >= windowStart)) {
+                    return false;
+                }
+            } else if (end_datetime) {
+                const windowEnd = new Date(end_datetime);
+                if (!(endDateTime <= windowEnd)) {
+                    return false;
+                }
+            }
+    
+            // Check if entry matches the given location
+            if (location && entry.location !== location) {
+                return false;
+            }
+    
+            return true;
+        });
+    
+        res.json(filteredData);
+    });
+    
 app.listen(3000, function () {
   console.log('App listening on port 3000!');
 });
