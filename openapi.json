@@ -93,12 +93,12 @@
               },
               "start_datetime": {
                 "type": "string",
-                "format": "date-time",
+                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)",
                 "description": "The start datetime of the schedule entry."
               },
               "end_datetime": {
                 "type": "string",
-                "format": "date-time",
+                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)",
                 "description": "The end datetime of the schedule entry."
               },
               "location": {
