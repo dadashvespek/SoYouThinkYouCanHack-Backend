@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config();
+app.use(express.json());
 
 const { Configuration, OpenAIApi } = require("openai");
 
@@ -123,24 +124,8 @@ app.get("/data/:user_id", async (req, res) => {
     const user_id = req.params.user_id;
   
     // Parse the query parameters
-  console.log(new Date());
-    async function validateJson() {
-      const response = await chat(`Validate this json, it should have this format: \`\`\`{ "start_datetime": "2021-09-01T09:00:00", "end_datetime": "2021-09-01T10:00:00", "location": "NUS"}\`\`\` note that today's date is ${new Date()}, assume that as the default value if not provided, assume time is 00:00:00 (start) and 11:59:59 (end) if not provided, leave location empty if not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
-    
-      if (response) {
-        console.log('Validated JSON:', response);
-      } else {
-        console.error('Error occurred while validating JSON.');
-      }
-      return response;
-    }
-    
-    
-    response = await validateJson();
-    const { start_datetime, end_datetime, location } = JSON.parse(response);
-    console.log(
-      `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
-    );
+    const { start_datetime, end_datetime, location } = req.query;
+  
     // Build the query
     let query = supabase
       .from("schedules")
@@ -171,6 +156,13 @@ app.get("/data/:user_id", async (req, res) => {
       res.json({});
       return;
     }
+
+  // Parse the query parameters
+
+  console.log(
+    `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
+  );
+  // Filter the data based on the query parameters
   const filteredData = data.filter((entry) => {
     // Default to today's date if date is not provided
     const currentDateTime = new Date();
@@ -274,78 +266,131 @@ app.get("/data/:user_id", async (req, res) => {
 
 // Register a new user
 app.post("/api/users", async (req, res) => {
-  const { user_id, name, email, password } = req.body;
-  const { data, error } = await supabase
-    .from("users")
-    .insert([{ user_id, name, email, password }]);
-
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
+  try {
+    const { user_id, name, email, password } = req.body;
+    const { data, error } = await supabase
+      .from("users")
+      .insert([{ user_id, name, email, password }]);
+    if (error) throw error;
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `User with ID ${user_id} was created successfully.`,
+        user: data,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
-  const { user_id } = req.params;
-  const { event_name, location, start_datetime, end_datetime, repeating } =
-    req.body;
-  const { data, error } = await supabase.from("schedules").insert([
-    {
-      user_id,
+  try {
+    const { user_id } = req.params;
+    const { event_name, location, start_datetime, end_datetime, repeating } =
+      req.body;
+    const { data, error } = await supabase.from("schedules").insert([
+      {
+        user_id,
+        event_name,
+        location,
+        start_datetime,
+        end_datetime,
+        repeating,
+      },
+    ]);
+    if (error) throw error;
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${event_name}' was created successfully for user ${user_id}.`,
+        event: data,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Retrieve all events for a specific user
+app.get("/api/users/:user_id/schedules", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const { data, error } = await supabase
+      .from("schedules")
+      .select("*")
+      .eq("user_id", user_id);
+    if (error) throw error;
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Retrieved all events for user ${user_id}.`,
+        events: data,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update a specific event for a specific user
+app.put("/api/users/:user_id/schedules", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const {
+      old_event_name,
+      old_start_datetime,
+      old_end_datetime,
       event_name,
       location,
       start_datetime,
       end_datetime,
       repeating,
-    },
-  ]);
-
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
-});
-
-// Retrieve all events for a specific user
-app.get("/api/users/:user_id/schedules", async (req, res) => {
-  const { user_id } = req.params;
-  const { data, error } = await supabase
-    .from("schedules")
-    .select("*")
-    .eq("user_id", user_id);
-
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
-});
-
-// Update a specific event for a specific user
-app.put("/api/users/:user_id/schedules", async (req, res) => {
-  const { user_id } = req.params;
-  const { event_name, location, start_datetime, end_datetime, repeating } =
-    req.body;
-  const { data, error } = await supabase
-    .from("schedules")
-    .update({ event_name, location, start_datetime, end_datetime, repeating })
-    .eq("user_id", user_id)
-    .eq("event_name", event_name)
-    .eq("start_datetime", start_datetime)
-    .eq("end_datetime", end_datetime);
-
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
+    } = req.body;
+    const { data, error } = await supabase
+      .from("schedules")
+      .update({ event_name, location, start_datetime, end_datetime, repeating })
+      .eq("user_id", user_id)
+      .eq("event_name", old_event_name)
+      .eq("start_datetime", old_start_datetime)
+      .eq("end_datetime", old_end_datetime);
+    if (error) throw error;
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${old_event_name}' for user ${user_id} was updated successfully.`,
+        event: data,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Delete a specific event for a specific user
 app.delete("/api/users/:user_id/schedules", async (req, res) => {
-  const { user_id } = req.params;
-  const { event_name, start_datetime, end_datetime } = req.body;
-  const { data, error } = await supabase
-    .from("schedules")
-    .delete()
-    .eq("user_id", user_id)
-    .eq("event_name", event_name)
-    .eq("start_datetime", start_datetime)
-    .eq("end_datetime", end_datetime);
-
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
+  try {
+    const { user_id } = req.params;
+    const { event_name, start_datetime, end_datetime } = req.body;
+    const { data, error } = await supabase
+      .from("schedules")
+      .delete()
+      .eq("user_id", user_id)
+      .eq("event_name", event_name)
+      .eq("start_datetime", start_datetime)
+      .eq("end_datetime", end_datetime);
+    if (error) throw error;
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${event_name}' for user ${user_id} was deleted successfully.`,
+        event: data,
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.listen(3000, function () {
