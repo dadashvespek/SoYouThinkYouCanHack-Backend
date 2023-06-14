@@ -150,8 +150,31 @@ app.get("/data/:user_id", async (req, res) => {
   );
   // Filter the data based on the query parameters
   const filteredData = data.filter((entry) => {
-    const startDateTime = new Date(entry.start_datetime);
-    const endDateTime = new Date(entry.end_datetime);
+    // Default to today's date if date is not provided
+    const currentDateTime = new Date();
+    const currentDate = currentDateTime.toISOString().split("T")[0];
+
+    let startDateTime = new Date(entry.start_datetime);
+    let endDateTime = new Date(entry.end_datetime);
+
+    // Check if the date and time are in the correct format
+    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+
+    // If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${start_datetime}T00:00:00`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${end_datetime}T23:59:59`);
+    }
+
+    // If a start or end datetime is given but it doesn't contain a date, assume it's today's date
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${currentDate}T${start_datetime}`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${currentDate}T${end_datetime}`);
+    }
 
     // Check if entry falls within the datetime window
     if (start_datetime && end_datetime) {
