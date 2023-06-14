@@ -2,6 +2,28 @@ const express = require('express');
 const app = express();
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
+
+const { Configuration, OpenAIApi } = require('openai');
+
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+async function chat(prompt) {
+    const completion = await openai.ChatCompletion.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: prompt }
+      ],
+        maxTokens: 64,
+        temperature: 0.9,
+        topP: 1
+    });
+  
+    const reply = completion.choices[0].message.content;
+    return reply;
+  }
 const path = require('path');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 app.set('view engine', 'ejs');
