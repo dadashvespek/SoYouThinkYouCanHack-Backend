@@ -3,8 +3,7 @@
 	"name_for_human": "Scheduler Plugin",
 	"name_for_model": "Schedule data_fetcher Plugin",
 	"description_for_human": "Plugin for fetching and filtering user data based on the provided parameters such as start and end datetime, and location.",
-	"description_for_model": "Use the Schedule data_fetcher Plugin to fetch and filter user data. Provide the user ID and optional parameters like start and end datetime, and location, and the plugin will return the filtered data.",
-	"api": {
+	"description_for_model": "The Data Fetcher plugin retrieves and filters user schedule data based on specific parameters. To use the API, you should parse user prompts to extract the necessary parameters. The primary parameter is the 'user_id', which should be part of the URL path. In addition to 'user_id', the API also accepts optional query parameters: 'start_datetime', 'end_datetime', and 'location'. These parameters should be parsed from user prompts and included in the API request as needed. For example, if a user prompt is 'Get the schedule for user 123 starting from June 10, 2023', parse the user_id (123) and start_datetime ('June 10, 2023') from the prompt and make a GET request to '/data/123?start_datetime=2023-06-10'. If a user prompt is 'Get the schedule for user 123 between June 10, 2023 and June 20, 2023 at the gym', parse the user_id (123), start_datetime ('June 10, 2023'), end_datetime ('June 20, 2023'), and location ('gym') from the prompt. Then, make a GET request to '/data/123?start_datetime=2023-06-10&end_datetime=2023-06-20&location=gym'. Remember that the API expects datetimes in the ISO 8601 format (YYYY-MM-DD) and user_id as a string. The location should be a string that matches exactly with the locations in the data. Ensure to correctly parse and format these values from user prompts.",	"api": {
 		"type": "openapi",
 		"url": "https://scary-fashion-eel.cyclic.app/openapi.json",
 		"is_user_authenticated": false
