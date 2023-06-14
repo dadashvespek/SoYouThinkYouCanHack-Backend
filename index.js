@@ -47,14 +47,12 @@ app.route('/schedule/:user_id/:weekOffset?')
             schedule: weekData.flatMap(entry => {
                 const startDateTime = new Date(entry.start_datetime);
                 const endDateTime = new Date(entry.end_datetime);
-                const start = startDateTime.getHours() * 4 + Math.floor(startDateTime.getMinutes() / 15);
-                const end = endDateTime.getHours() * 4 + Math.ceil(endDateTime.getMinutes() / 15);
                 if (entry.repeating === 'Everyday') {
                     // Create an entry for each day of the week
                     return Array(7).fill().map((_, dayOfWeek) => ({
                         dayOfWeek: dayOfWeek,
-                        start: start,
-                        end: end,
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
                         event_name: entry.event_name,
                         location: entry.location
                     }));
@@ -62,23 +60,22 @@ app.route('/schedule/:user_id/:weekOffset?')
                     // Create an entry for the same day of each week
                     return {
                         dayOfWeek: startDateTime.getDay(),
-                        start: start,
-                        end: end,
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
                         event_name: entry.event_name,
                         location: entry.location
                     };
                 } else {
                     return {
                         dayOfWeek: startDateTime.getDay(),
-                        start: start,
-                        end: end,
+                        startHour: startDateTime.getHours(),
+                        endHour: endDateTime.getHours(),
                         event_name: entry.event_name,
                         location: entry.location
                     };
                 }
             })
         };
-        
 
         res.render('schedule', transformedData);
     })
