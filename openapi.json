@@ -30,7 +30,7 @@
               "name": "start_datetime",
               "schema": {
                 "type": "string",
-                "format": "date-time"
+                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)"
               },
               "required": false,
               "description": "The start datetime for filtering the data."
