@@ -6,33 +6,6 @@ const path = require('path');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname)));
-const consolidateData = (data) => {
-    // Group events
-    const groupedData = {};
-    data.forEach(entry => {
-        const key = `${entry.event_name}@${entry.location}@${entry.startHour}@${entry.endHour}`;
-        if (groupedData[key]) {
-            groupedData[key].push(entry.dayOfWeek);
-        } else {
-            groupedData[key] = [entry.dayOfWeek];
-        }
-    });
-
-    // Format and condense the data
-    const consolidatedData = Object.keys(groupedData).map(key => {
-        const [event_name, location, startHour, endHour] = key.split('@');
-        const daysOfWeek = groupedData[key];
-        return {
-            event_name,
-            location,
-            time: `${startHour}:00 - ${endHour}:00`,
-            daysOfWeek: daysOfWeek.sort(),  // Sort days for consistent order
-            repeat: daysOfWeek.length > 1
-        };
-    });
-
-    return consolidatedData;
-};
 app.route('/schedule/:user_id/:weekOffset?')
     .get(async (req, res) => {
         const user_id = req.params.user_id;
@@ -161,9 +134,37 @@ app.route('/schedule/:user_id/:weekOffset?')
             return true;
         });
     
-        const consolidatedData = consolidateData(filteredData);
+        const consolidatedData = {};
 
-        res.json(consolidatedData);
+        filteredData.forEach(entry => {
+            const startDateTime = new Date(entry.start_datetime);
+            const endDateTime = new Date(entry.end_datetime);
+    
+            const date = startDateTime.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+            const startTime = startDateTime.getHours();
+            const endTime = endDateTime.getHours();
+    
+            if (!consolidatedData[date]) {
+                consolidatedData[date] = [];
+            }
+    
+            consolidatedData[date].push({
+                startTime,
+                endTime,
+                eventName: entry.event_name,
+                location: entry.location,
+            });
+        });
+    
+        // Convert consolidatedData into a more readable format
+        const result = Object.entries(consolidatedData).map(([date, events]) => {
+            const eventSummaries = events.map(event => {
+                return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
+            });
+            return `${date}: ${eventSummaries.join(', ')}`;
+        });
+    
+        res.json(result);
     });
     
 app.listen(3000, function () {
