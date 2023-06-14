@@ -104,7 +104,7 @@ app.route('/schedule/:user_id/:weekOffset?')
     
         // Parse the query parameters
         const { start_datetime, end_datetime, location } = req.query;
-    
+        console.log(`start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`)
         // Filter the data based on the query parameters
         const filteredData = data.filter(entry => {
             const startDateTime = new Date(entry.start_datetime);
