@@ -47,12 +47,14 @@ app.route('/schedule/:user_id/:weekOffset?')
             schedule: weekData.flatMap(entry => {
                 const startDateTime = new Date(entry.start_datetime);
                 const endDateTime = new Date(entry.end_datetime);
+                const start = startDateTime.getHours() * 4 + Math.floor(startDateTime.getMinutes() / 15);
+                const end = endDateTime.getHours() * 4 + Math.ceil(endDateTime.getMinutes() / 15);
                 if (entry.repeating === 'Everyday') {
                     // Create an entry for each day of the week
                     return Array(7).fill().map((_, dayOfWeek) => ({
                         dayOfWeek: dayOfWeek,
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
+                        start: start,
+                        end: end,
                         event_name: entry.event_name,
                         location: entry.location
                     }));
@@ -60,22 +62,23 @@ app.route('/schedule/:user_id/:weekOffset?')
                     // Create an entry for the same day of each week
                     return {
                         dayOfWeek: startDateTime.getDay(),
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
+                        start: start,
+                        end: end,
                         event_name: entry.event_name,
                         location: entry.location
                     };
                 } else {
                     return {
                         dayOfWeek: startDateTime.getDay(),
-                        startHour: startDateTime.getHours(),
-                        endHour: endDateTime.getHours(),
+                        start: start,
+                        end: end,
                         event_name: entry.event_name,
                         location: entry.location
                     };
                 }
             })
         };
+        
 
         res.render('schedule', transformedData);
     })
@@ -134,7 +137,37 @@ app.route('/schedule/:user_id/:weekOffset?')
             return true;
         });
     
-        res.json(filteredData);
+        const consolidatedData = {};
+
+        filteredData.forEach(entry => {
+            const startDateTime = new Date(entry.start_datetime);
+            const endDateTime = new Date(entry.end_datetime);
+    
+            const date = startDateTime.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+            const startTime = startDateTime.getHours();
+            const endTime = endDateTime.getHours();
+    
+            if (!consolidatedData[date]) {
+                consolidatedData[date] = [];
+            }
+    
+            consolidatedData[date].push({
+                startTime,
+                endTime,
+                eventName: entry.event_name,
+                location: entry.location,
+            });
+        });
+    
+        // Convert consolidatedData into a more readable format
+        const result = Object.entries(consolidatedData).map(([date, events]) => {
+            const eventSummaries = events.map(event => {
+                return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
+            });
+            return `${date}: ${eventSummaries.join(', ')}`;
+        });
+    
+        res.json(result);
     });
     
 app.listen(3000, function () {
