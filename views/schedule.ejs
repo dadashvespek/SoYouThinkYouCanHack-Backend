@@ -142,14 +142,15 @@
     </thead>
     <tbody>
       <% let startHour = 6; let endHour = 29; %>
-      <% for (let i = startHour; i <= endHour; i++) { %>
+      <% for (let i = startHour * 4; i <= endHour * 4; i++) { %>
       <tr>
-        <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
-        <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
+        <% const displayHour = Math.floor(i / 4) === 24 ? 12 : (Math.floor(i / 4) % 12 === 0 ? 12 : Math.floor(i / 4) % 12); %>
+        <% const displayMinute = i % 4 * 15; %>
+        <td><%= displayHour %>:<%= displayMinute < 10 ? '0' : '' %><%= displayMinute %> <%= Math.floor(i / 4) < 12 || Math.floor(i / 4) >= 24 ? 'AM' : 'PM' %></td>
         <% for (let j = 0; j < 7; j++) { %>
-        <td class="<%= schedule.find(e => e.dayOfWeek === j && e.startHour === i % 24) ? 'event' : '' %>">
+        <td class="<%= schedule.find(e => e.dayOfWeek === j && e.start <= i && e.end > i) ? 'event' : '' %>">
           <% 
-          const event = schedule.find(e => e.dayOfWeek === j && e.startHour === i % 24);
+          const event = schedule.find(e => e.dayOfWeek === j && e.start <= i && e.end > i);
           if (event) {
             // Event exists for this cell, display it
             %>
