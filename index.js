@@ -9,26 +9,21 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-async function chat(prompt) {
-  const completion = await openai.ChatCompletion.create({
+async function chat(message) {
+  const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: prompt },
-    ],
-    maxTokens: 64,
-    temperature: 0.9,
-    topP: 1,
+    messages: [{"role": "system", "content": "json data validator"}, {role: "user", content: `${message}`}],
   });
-
-  const reply = completion.choices[0].message.content;
-  return reply;
+  console.log(completion.data.choices[0].message.content);
+  return completion.data.choices[0].message.content;
 }
+
 const path = require("path");
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
+
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname)));
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
@@ -128,8 +123,24 @@ app.get("/data/:user_id", async (req, res) => {
     const user_id = req.params.user_id;
   
     // Parse the query parameters
-    const { start_datetime, end_datetime, location } = req.query;
-  
+  console.log(new Date());
+    async function validateJson() {
+      const response = await chat(`Validate this json, it should have this format: \`\`\`{ "start_datetime": "2021-09-01T09:00:00", "end_datetime": "2021-09-01T10:00:00", "location": "NUS"}\`\`\` note that today's date is ${new Date()}, assume that as the default value if not provided, assume time is 00:00:00 (start) and 11:59:59 (end) if not provided, leave location empty if not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
+    
+      if (response) {
+        console.log('Validated JSON:', response);
+      } else {
+        console.error('Error occurred while validating JSON.');
+      }
+      return response;
+    }
+    
+    
+    response = await validateJson();
+    const { start_datetime, end_datetime, location } = JSON.parse(response);
+    console.log(
+      `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
+    );
     // Build the query
     let query = supabase
       .from("schedules")
@@ -160,13 +171,6 @@ app.get("/data/:user_id", async (req, res) => {
       res.json({});
       return;
     }
-
-  // Parse the query parameters
-
-  console.log(
-    `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
-  );
-  // Filter the data based on the query parameters
   const filteredData = data.filter((entry) => {
     // Default to today's date if date is not provided
     const currentDateTime = new Date();
@@ -218,8 +222,22 @@ app.get("/data/:user_id", async (req, res) => {
       return false;
     }
 
+    // Check if entry is repeating and handle accordingly
+    if (entry.repeating) {
+      if (entry.repeating === "Everyday") {
+        if (currentDateTime.getHours() < startDateTime.getHours() || currentDateTime.getHours() > endDateTime.getHours()) {
+          return false;
+        }
+      } else if (entry.repeating === "Everyweek") {
+        if (currentDateTime.getDay() !== startDateTime.getDay()) {
+          return false;
+        }
+      }
+    }
+
     return true;
   });
+
 
   const consolidatedData = {};
 
