@@ -44,15 +44,6 @@
               },
               "required": true,
               "description": "The end datetime for filtering the data."
-            },
-            {
-              "in": "query",
-              "name": "location",
-              "schema": {
-                "type": "string"
-              },
-              "required": false,
-              "description": "The location for filtering the data."
             }
           ],
           "responses": {

@@ -13,7 +13,7 @@ const openai = new OpenAIApi(configuration);
 async function chat(message) {
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0613",
-    messages: [{"role": "system", "content": "json data validator"}, {role: "user", content: `${message}`}],
+    messages: [{"role": "system", "content": "you are an assistant that converts natural language to the correct format json"}, {role: "user", content: `${message}`}],
   });
   console.log(completion.data.choices[0].message.content);
   return completion.data.choices[0].message.content;
@@ -120,13 +120,14 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   res.render("schedule", transformedData);
 });
 
+
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
 
   // Parse the query parameters
 console.log(new Date());
   async function validateJson() {
-    const response = await chat(`Validate this json, it should have this format: \`\`\`{ "start_datetime": "2021-09-01T09:00:00", "end_datetime": "2021-09-01T10:00:00", "location": "NUS"}\`\`\` note that today's date is ${new Date()}, assume that as the default value if not provided, assume time is 00:00:00 (start) and 11:59:59 (end) if not provided, leave location empty if not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
+    const response = await chat(`convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}, not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
   
     if (response) {
       console.log('Validated JSON:', response);
@@ -135,12 +136,16 @@ console.log(new Date());
     }
     return response;
   }
-  
-  
+
+if (JSON.stringify(req.query) === '{}') {
+  response = JSON.stringify(req.query);
+} else {
   response = await validateJson();
-  const { start_datetime, end_datetime, location } = JSON.parse(response);
+}
+
+  const { start_datetime, end_datetime} = JSON.parse(response);
   console.log(
-    `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
+    `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}`
   );
   // Build the query
   let query = supabase
@@ -154,10 +159,6 @@ console.log(new Date());
 
   if (end_datetime) {
     query = query.lte("end_datetime", end_datetime);
-  }
-
-  if (location) {
-    query = query.eq("location", location);
   }
 
   // Fetch the data from Supabase
@@ -217,25 +218,6 @@ const filteredData = data.filter((entry) => {
       return false;
     }
   }
-
-  // Check if entry matches the given location
-  if (location && entry.location !== location) {
-    return false;
-  }
-
-  // Check if entry is repeating and handle accordingly
-  if (entry.repeating) {
-    if (entry.repeating === "Everyday") {
-      if (currentDateTime.getHours() < startDateTime.getHours() || currentDateTime.getHours() > endDateTime.getHours()) {
-        return false;
-      }
-    } else if (entry.repeating === "Everyweek") {
-      if (currentDateTime.getDay() !== startDateTime.getDay()) {
-        return false;
-      }
-    }
-  }
-
   return true;
 });
 
@@ -272,6 +254,8 @@ const result = Object.entries(consolidatedData).map(([date, events]) => {
 
 res.json(result);
 });
+
+
 
 // Register a new user
 app.post("/api/users", async (req, res) => {
