@@ -12,7 +12,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 async function chat(message) {
   const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
+    model: "gpt-3.5-turbo-0613",
     messages: [{"role": "system", "content": "json data validator"}, {role: "user", content: `${message}`}],
   });
   console.log(completion.data.choices[0].message.content);
@@ -121,168 +121,191 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 });
 
 app.get("/data/:user_id", async (req, res) => {
-    const user_id = req.params.user_id;
-  
-    // Parse the query parameters
-    const { start_datetime, end_datetime, location } = req.query;
-  
-    // Build the query
-    let query = supabase
-      .from("schedules")
-      .select("*")
-      .eq("user_id", user_id);
-  
-    if (start_datetime) {
-      query = query.gte("start_datetime", start_datetime);
-    }
-  
-    if (end_datetime) {
-      query = query.lte("end_datetime", end_datetime);
-    }
-  
-    if (location) {
-      query = query.eq("location", location);
-    }
-  
-    // Fetch the data from Supabase
-    let { data, error } = await query;
-  
-    if (error) {
-      res.status(500).json({ error: "Failed to fetch data from Supabase" });
-      return;
-    }
-  
-    if (!data) {
-      res.json({});
-      return;
-    }
+  const user_id = req.params.user_id;
 
   // Parse the query parameters
-
+console.log(new Date());
+  async function validateJson() {
+    const response = await chat(`Validate this json, it should have this format: \`\`\`{ "start_datetime": "2021-09-01T09:00:00", "end_datetime": "2021-09-01T10:00:00", "location": "NUS"}\`\`\` note that today's date is ${new Date()}, assume that as the default value if not provided, assume time is 00:00:00 (start) and 11:59:59 (end) if not provided, leave location empty if not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
+  
+    if (response) {
+      console.log('Validated JSON:', response);
+    } else {
+      console.error('Error occurred while validating JSON.');
+    }
+    return response;
+  }
+  
+  
+  response = await validateJson();
+  const { start_datetime, end_datetime, location } = JSON.parse(response);
   console.log(
     `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}, location: ${location}`
   );
-  // Filter the data based on the query parameters
-  const filteredData = data.filter((entry) => {
-    // Default to today's date if date is not provided
-    const currentDateTime = new Date();
-    const currentDate = currentDateTime.toISOString().split("T")[0];
+  // Build the query
+  let query = supabase
+    .from("schedules")
+    .select("*")
+    .eq("user_id", user_id);
 
-    let startDateTime = new Date(entry.start_datetime);
-    let endDateTime = new Date(entry.end_datetime);
+  if (start_datetime) {
+    query = query.gte("start_datetime", start_datetime);
+  }
 
-    // Check if the date and time are in the correct format
-    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+  if (end_datetime) {
+    query = query.lte("end_datetime", end_datetime);
+  }
 
-    // If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
-    if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      startDateTime = new Date(`${start_datetime}T00:00:00`);
-    }
-    if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      endDateTime = new Date(`${end_datetime}T23:59:59`);
-    }
+  if (location) {
+    query = query.eq("location", location);
+  }
 
-    // If a start or end datetime is given but it doesn't contain a date, assume it's today's date
-    if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      startDateTime = new Date(`${currentDate}T${start_datetime}`);
-    }
-    if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      endDateTime = new Date(`${currentDate}T${end_datetime}`);
-    }
+  // Fetch the data from Supabase
+  let { data, error } = await query;
 
-    // Check if entry falls within the datetime window
-    if (start_datetime && end_datetime) {
-      const windowStart = new Date(start_datetime);
-      const windowEnd = new Date(end_datetime);
-      if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
-        return false;
-      }
-    } else if (start_datetime) {
-      const windowStart = new Date(start_datetime);
-      if (!(startDateTime >= windowStart)) {
-        return false;
-      }
-    } else if (end_datetime) {
-      const windowEnd = new Date(end_datetime);
-      if (!(endDateTime <= windowEnd)) {
-        return false;
-      }
-    }
+  if (error) {
+    res.status(500).json({ error: "Failed to fetch data from Supabase" });
+    return;
+  }
 
-    // Check if entry matches the given location
-    if (location && entry.location !== location) {
+  if (!data) {
+    res.json({});
+    return;
+  }
+const filteredData = data.filter((entry) => {
+  // Default to today's date if date is not provided
+  const currentDateTime = new Date();
+  const currentDate = currentDateTime.toISOString().split("T")[0];
+
+  let startDateTime = new Date(entry.start_datetime);
+  let endDateTime = new Date(entry.end_datetime);
+
+  // Check if the date and time are in the correct format
+  const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+
+  // If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
+  if (start_datetime && !datetimeRegex.test(start_datetime)) {
+    startDateTime = new Date(`${start_datetime}T00:00:00`);
+  }
+  if (end_datetime && !datetimeRegex.test(end_datetime)) {
+    endDateTime = new Date(`${end_datetime}T23:59:59`);
+  }
+
+  // If a start or end datetime is given but it doesn't contain a date, assume it's today's date
+  if (start_datetime && !datetimeRegex.test(start_datetime)) {
+    startDateTime = new Date(`${currentDate}T${start_datetime}`);
+  }
+  if (end_datetime && !datetimeRegex.test(end_datetime)) {
+    endDateTime = new Date(`${currentDate}T${end_datetime}`);
+  }
+
+  // Check if entry falls within the datetime window
+  if (start_datetime && end_datetime) {
+    const windowStart = new Date(start_datetime);
+    const windowEnd = new Date(end_datetime);
+    if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
       return false;
     }
+  } else if (start_datetime) {
+    const windowStart = new Date(start_datetime);
+    if (!(startDateTime >= windowStart)) {
+      return false;
+    }
+  } else if (end_datetime) {
+    const windowEnd = new Date(end_datetime);
+    if (!(endDateTime <= windowEnd)) {
+      return false;
+    }
+  }
 
-    // Check if entry is repeating and handle accordingly
-    if (entry.repeating) {
-      if (entry.repeating === "Everyday") {
-        if (currentDateTime.getHours() < startDateTime.getHours() || currentDateTime.getHours() > endDateTime.getHours()) {
-          return false;
-        }
-      } else if (entry.repeating === "Everyweek") {
-        if (currentDateTime.getDay() !== startDateTime.getDay()) {
-          return false;
-        }
+  // Check if entry matches the given location
+  if (location && entry.location !== location) {
+    return false;
+  }
+
+  // Check if entry is repeating and handle accordingly
+  if (entry.repeating) {
+    if (entry.repeating === "Everyday") {
+      if (currentDateTime.getHours() < startDateTime.getHours() || currentDateTime.getHours() > endDateTime.getHours()) {
+        return false;
+      }
+    } else if (entry.repeating === "Everyweek") {
+      if (currentDateTime.getDay() !== startDateTime.getDay()) {
+        return false;
       }
     }
+  }
 
-    return true;
+  return true;
+});
+
+
+const consolidatedData = {};
+
+filteredData.forEach((entry) => {
+  const startDateTime = new Date(entry.start_datetime);
+  const endDateTime = new Date(entry.end_datetime);
+
+  const date = startDateTime.toISOString().split("T")[0]; // Get date in YYYY-MM-DD format
+  const startTime = startDateTime.getHours();
+  const endTime = endDateTime.getHours();
+
+  if (!consolidatedData[date]) {
+    consolidatedData[date] = [];
+  }
+
+  consolidatedData[date].push({
+    startTime,
+    endTime,
+    eventName: entry.event_name,
+    location: entry.location,
   });
+});
 
-
-  const consolidatedData = {};
-
-  filteredData.forEach((entry) => {
-    const startDateTime = new Date(entry.start_datetime);
-    const endDateTime = new Date(entry.end_datetime);
-
-    const date = startDateTime.toISOString().split("T")[0]; // Get date in YYYY-MM-DD format
-    const startTime = startDateTime.getHours();
-    const endTime = endDateTime.getHours();
-
-    if (!consolidatedData[date]) {
-      consolidatedData[date] = [];
-    }
-
-    consolidatedData[date].push({
-      startTime,
-      endTime,
-      eventName: entry.event_name,
-      location: entry.location,
-    });
+// Convert consolidatedData into a more readable format
+const result = Object.entries(consolidatedData).map(([date, events]) => {
+  const eventSummaries = events.map((event) => {
+    return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
   });
+  return `${date}: ${eventSummaries.join(", ")}`;
+});
 
-  // Convert consolidatedData into a more readable format
-  const result = Object.entries(consolidatedData).map(([date, events]) => {
-    const eventSummaries = events.map((event) => {
-      return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
-    });
-    return `${date}: ${eventSummaries.join(", ")}`;
-  });
-
-  res.json(result);
+res.json(result);
 });
 
 // Register a new user
 app.post("/api/users", async (req, res) => {
-  try {
-    const { user_id, name, email, password } = req.body;
-    const { data, error } = await supabase
-      .from("users")
-      .insert([{ user_id, name, email, password }]);
-    if (error) throw error;
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `User with ID ${user_id} was created successfully.`,
-        user: data,
-      });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+const { user_id, name, email, password } = req.body;
+const { data, error } = await supabase
+  .from("users")
+  .insert([{ user_id, name, email, password }]);
+
+if (error) return res.status(500).json({ error: error.message });
+return res.status(200).json(data);
 });
+
+// Create a new event for a specific user
+app.post("/api/users/:user_id/schedules", async (req, res) => {
+const { user_id } = req.params;
+const { event_name, location, start_datetime, end_datetime, repeating } =
+  req.body;
+const { data, error } = await supabase.from("schedules").insert([
+  {
+    user_id,
+    event_name,
+    location,
+    start_datetime,
+    end_datetime,
+    repeating,
+  },
+]);
+
+if (error) return res.status(500).json({ error: error.message });
+return res.status(200).json(data);
+});
+
+
+
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
@@ -396,3 +419,4 @@ app.delete("/api/users/:user_id/schedules", async (req, res) => {
 app.listen(3000, function () {
   console.log("App listening on port 3000!");
 });
+
