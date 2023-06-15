@@ -3,7 +3,7 @@
 	"name_for_human": "Scheduler Plugin",
 	"name_for_model": "Schedule data_fetcher Plugin",
 	"description_for_human": "Plugin for fetching and filtering user data based on the provided parameters such as start and end datetime, and location.",
-	"description_for_model": "The Data Fetcher plugin retrieves and filters user schedule data based on specific parameters.",	"api": {
+	"description_for_model": "The Data Fetcher plugin retrieves/filters/modifies user schedule data based on specific parameters.",	"api": {
 		"type": "openapi",
 		"url": "https://scary-fashion-eel.cyclic.app/openapi.json",
 		"is_user_authenticated": false
