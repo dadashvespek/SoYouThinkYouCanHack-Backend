@@ -263,9 +263,6 @@ function formatResult(consolidatedData) {
   });
 }
 
-
-
-
 // Register a new user
 app.post("/api/users", async (req, res) => {
 const { user_id, name, email, password } = req.body;
