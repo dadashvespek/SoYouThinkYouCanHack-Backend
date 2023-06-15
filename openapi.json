@@ -30,7 +30,7 @@
               "name": "start_datetime",
               "schema": {
                 "type": "string",
-                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)"
+                "format": "date-time"
               },
               "required": true,
               "description": "The start datetime for filtering the data."
@@ -84,12 +84,12 @@
               },
               "start_datetime": {
                 "type": "string",
-                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)",
+                "format": "date-time",
                 "description": "The start datetime of the schedule entry."
               },
               "end_datetime": {
                 "type": "string",
-                "format": "date-time YYYY/MM/DD HH:MM:SS (ISO 8601)",
+                "format": "date-time",
                 "description": "The end datetime of the schedule entry."
               },
               "location": {
