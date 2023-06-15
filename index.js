@@ -123,137 +123,146 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
+  const { start_datetime, end_datetime } = await validateJson(req.query);
 
-  // Parse the query parameters
-console.log(new Date());
-  async function validateJson() {
-    const response = await chat(`convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}, not provided json:${JSON.stringify(req.query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
-  
-    if (response) {
-      console.log('Validated JSON:', response);
-    } else {
-      console.error('Error occurred while validating JSON.');
-    }
-    return response;
-  }
-
-if (JSON.stringify(req.query) === '{}') {
-  response = JSON.stringify(req.query);
-} else {
-  response = await validateJson();
-}
-
-  const { start_datetime, end_datetime} = JSON.parse(response);
-  console.log(
-    `start_datetime: ${start_datetime}, end_datetime: ${end_datetime}`
-  );
   // Build the query
   let query = supabase
-    .from("schedules")
-    .select("*")
-    .eq("user_id", user_id);
+  .from("schedules")
+  .select("*")
+  .eq("user_id", user_id);
 
-  if (start_datetime) {
-    query = query.gte("start_datetime", start_datetime);
-  }
+// Fetch the data from Supabase
+let { data, error } = await query;
 
-  if (end_datetime) {
-    query = query.lte("end_datetime", end_datetime);
-  }
+if (error) {
+  res.status(500).json({ error: "Failed to fetch data from Supabase" });
+  return;
+}
 
-  // Fetch the data from Supabase
-  let { data, error } = await query;
+if (!data) {
+  res.json({});
+  return;
+}
 
-  if (error) {
-    res.status(500).json({ error: "Failed to fetch data from Supabase" });
-    return;
-  }
 
-  if (!data) {
-    res.json({});
-    return;
-  }
-const filteredData = data.filter((entry) => {
-  // Default to today's date if date is not provided
-  const currentDateTime = new Date();
-  const currentDate = currentDateTime.toISOString().split("T")[0];
+  const filteredData = filterData(data, start_datetime, end_datetime);
+  const consolidatedData = consolidateData(filteredData);
+  const result = formatResult(consolidatedData);
 
-  let startDateTime = new Date(entry.start_datetime);
-  let endDateTime = new Date(entry.end_datetime);
-
-  // Check if the date and time are in the correct format
-  const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
-
-  // If a start or end datetime is given but it doesn't contain a time, assume it's at the start or end of the day
-  if (start_datetime && !datetimeRegex.test(start_datetime)) {
-    startDateTime = new Date(`${start_datetime}T00:00:00`);
-  }
-  if (end_datetime && !datetimeRegex.test(end_datetime)) {
-    endDateTime = new Date(`${end_datetime}T23:59:59`);
-  }
-
-  // If a start or end datetime is given but it doesn't contain a date, assume it's today's date
-  if (start_datetime && !datetimeRegex.test(start_datetime)) {
-    startDateTime = new Date(`${currentDate}T${start_datetime}`);
-  }
-  if (end_datetime && !datetimeRegex.test(end_datetime)) {
-    endDateTime = new Date(`${currentDate}T${end_datetime}`);
-  }
-
-  // Check if entry falls within the datetime window
-  if (start_datetime && end_datetime) {
-    const windowStart = new Date(start_datetime);
-    const windowEnd = new Date(end_datetime);
-    if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
-      return false;
-    }
-  } else if (start_datetime) {
-    const windowStart = new Date(start_datetime);
-    if (!(startDateTime >= windowStart)) {
-      return false;
-    }
-  } else if (end_datetime) {
-    const windowEnd = new Date(end_datetime);
-    if (!(endDateTime <= windowEnd)) {
-      return false;
-    }
-  }
-  return true;
+  res.json(result);
 });
 
-
-const consolidatedData = {};
-
-filteredData.forEach((entry) => {
-  const startDateTime = new Date(entry.start_datetime);
-  const endDateTime = new Date(entry.end_datetime);
-
-  const date = startDateTime.toISOString().split("T")[0]; // Get date in YYYY-MM-DD format
-  const startTime = startDateTime.getHours();
-  const endTime = endDateTime.getHours();
-
-  if (!consolidatedData[date]) {
-    consolidatedData[date] = [];
+async function validateJson(query) {
+  if (JSON.stringify(query) === '{}') {
+    return {};
   }
 
-  consolidatedData[date].push({
-    startTime,
-    endTime,
-    eventName: entry.event_name,
-    location: entry.location,
+  const response = await chat(`convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}, not provided json:${JSON.stringify(query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
+
+  if (response) {
+    console.log('Validated JSON:', response);
+    return JSON.parse(response);
+  } else {
+    console.error('Error occurred while validating JSON.');
+    return {};
+  }
+}
+
+function filterData(data, start_datetime, end_datetime) {
+  return data.filter((entry) => {
+    const currentDateTime = new Date();
+    const currentDate = currentDateTime.toISOString().split("T")[0];
+    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+    let startDateTime = new Date(entry.start_datetime);
+    let endDateTime = new Date(entry.end_datetime);
+
+    if (entry.repeating === "Everyday") {
+      return true;
+    }
+
+    if (entry.repeating === "Everyweek") {
+      const startWeekday = startDateTime.getUTCDay();
+      const windowStart = new Date(start_datetime || `${currentDate}T00:00:00`);
+      const windowEnd = new Date(end_datetime || `${currentDate}T23:59:59`);
+      const windowStartWeekday = windowStart.getUTCDay();
+      const windowEndWeekday = windowEnd.getUTCDay();
+      // If the event's start weekday is within the range, include it
+      if (windowStartWeekday <= startWeekday && startWeekday <= windowEndWeekday) {
+        return true;
+      }
+    }
+
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${start_datetime}T00:00:00`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${end_datetime}T23:59:59`);
+    }
+
+    if (start_datetime && !datetimeRegex.test(start_datetime)) {
+      startDateTime = new Date(`${currentDate}T${start_datetime}`);
+    }
+    if (end_datetime && !datetimeRegex.test(end_datetime)) {
+      endDateTime = new Date(`${currentDate}T${end_datetime}`);
+    }
+
+    if (start_datetime && end_datetime) {
+      const windowStart = new Date(start_datetime);
+      const windowEnd = new Date(end_datetime);
+      if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
+        return false;
+      }
+    } else if (start_datetime) {
+      const windowStart = new Date(start_datetime);
+      if (!(startDateTime >= windowStart)) {
+        return false;
+      }
+    } else if (end_datetime) {
+      const windowEnd = new Date(end_datetime);
+      if (!(endDateTime <= windowEnd)) {
+        return false;
+      }
+    }
+    return true;
   });
-});
+}
 
-// Convert consolidatedData into a more readable format
-const result = Object.entries(consolidatedData).map(([date, events]) => {
-  const eventSummaries = events.map((event) => {
-    return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
+
+function consolidateData(data) {
+  const consolidatedData = {};
+
+  data.forEach((entry) => {
+    const startDateTime = new Date(entry.start_datetime);
+    const endDateTime = new Date(entry.end_datetime);
+
+    const date = startDateTime.toISOString().split("T")[0];
+    const startTime = startDateTime.getHours();
+    const endTime = endDateTime.getHours();
+
+    if (!consolidatedData[date]) {
+      consolidatedData[date] = [];
+    }
+
+    consolidatedData[date].push({
+      startTime,
+      endTime,
+      eventName: entry.event_name,
+      location: entry.location,
+    });
   });
-  return `${date}: ${eventSummaries.join(", ")}`;
-});
 
-res.json(result);
-});
+  return consolidatedData;
+}
+
+function formatResult(consolidatedData) {
+  return Object.entries(consolidatedData).map(([date, events]) => {
+    const eventSummaries = events.map((event) => {
+      return `${event.startTime}-${event.endTime}: ${event.eventName} at ${event.location}`;
+    });
+    return `${date}: ${eventSummaries.join(", ")}`;
+  });
+}
+
 
 
 
