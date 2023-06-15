@@ -20,6 +20,7 @@ async function chat(message) {
 }
 
 const path = require("path");
+const { start } = require("repl");
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
@@ -146,7 +147,7 @@ if (!data) {
 
 
   const filteredData = filterData(data, start_datetime, end_datetime);
-  const consolidatedData = consolidateData(filteredData);
+  const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
 
   res.json(result);
@@ -228,12 +229,49 @@ function filterData(data, start_datetime, end_datetime) {
 }
 
 
-function consolidateData(data) {
+function consolidateData(data, start_datetime, end_datetime) {
+  const windowStart = start_datetime ? new Date(start_datetime) : null;
+  const windowEnd = end_datetime ? new Date(end_datetime) : null;
   const consolidatedData = {};
 
   data.forEach((entry) => {
     const startDateTime = new Date(entry.start_datetime);
     const endDateTime = new Date(entry.end_datetime);
+
+        if (entry.repeating === 'Everyweek') {
+            while (startDateTime < windowStart) {
+                startDateTime.setDate(startDateTime.getDate() + 7);
+                endDateTime.setDate(endDateTime.getDate() + 7);
+            }
+            while (startDateTime > windowEnd) {
+                startDateTime.setDate(startDateTime.getDate() - 7);
+                endDateTime.setDate(endDateTime.getDate() - 7);
+            }
+        }
+
+        if (entry.repeating === 'Everyday') {
+            const dateCursor = new Date(windowStart);
+
+            while (dateCursor <= windowEnd) {
+                const date = dateCursor.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+                if (!consolidatedData[date]) {
+                    consolidatedData[date] = [];
+                }
+                
+                consolidatedData[date].push({
+                    startTime: startDateTime.getHours(),
+                    endTime: endDateTime.getHours(),
+                    eventName: entry.event_name,
+                    location: entry.location,
+                });
+
+                // Advance to next day
+                dateCursor.setDate(dateCursor.getDate() + 1);
+            }
+
+            // Skip the usual event addition logic for 'Everyday' events
+            return;
+        }
 
     const date = startDateTime.toISOString().split("T")[0];
     const startTime = startDateTime.getHours();
