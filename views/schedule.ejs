@@ -298,8 +298,9 @@
   <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
   <h1>Schedule for user <%= user_id %></h1>
   <div class="week-navigation">
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= parseInt(weekOffset) - 1 %>">Previous Week</a>
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= parseInt(weekOffset) + 1 %>">Next Week</a>
+    
   </div>
   <div class="table-container">
     <table>
