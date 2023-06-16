@@ -148,6 +148,10 @@ if (!data) {
   const filteredData = filterData(data, start_datetime, end_datetime);
   const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
+  if (result === []) {
+    res.send(`Nothing on schedule for user:${user_id}}`)
+    return;
+  }
 
   res.json(result);
 });
