@@ -377,7 +377,7 @@ app.post("/savetosupabase", async (req, res) => {
 
     // Prepare data for insert operation
     const insertData = events.map(event => ({
-      user_id,
+      user_id: user_id,
       event_name: event.event_name,
       location: event.location,
       start_datetime: event.start_datetime,
