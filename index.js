@@ -123,7 +123,6 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
 
 app.get("/data/:user_id", async (req, res) => {
-  console.log(`req: ${JSON.stringify(req)}`)
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = await validateJson(req.query);
 
