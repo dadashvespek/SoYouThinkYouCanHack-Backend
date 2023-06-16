@@ -132,12 +132,6 @@
   <pre id="content" style="white-space: pre-wrap;"></pre>
 
   <script type="text/javascript">
-    /* exported gapiLoaded */
-    /* exported gisLoaded */
-    /* exported handleAuthClick */
-    /* exported handleSignoutClick */
-
-    // TODO(developer): Set to client ID and API key from the Developer Console
     const CLIENT_ID = '622225267855-0nqjtlnf9som78m8fij2qd9gkpl302nv.apps.googleusercontent.com';
     const API_KEY = 'AIzaSyABk8-b8nybtZx7k0_GUPVCEN_U6pkhIO8';
 
@@ -255,9 +249,6 @@
         document.getElementById('content').innerText = err.message;
         return;
       }
-      console.log(`response: ${JSON.stringify(response)}`);
-      console.log(`response.result: ${JSON.stringify(response.result)}`);
-      console.log(`response.result.items: ${JSON.stringify(response.result.items)}`);
       const events = response.result.items;
       console.log(`events: ${JSON.stringify(events)}`);
       if (!events || events.length == 0) {
@@ -297,36 +288,42 @@
         <% let lastEventEndHour = Array(7).fill(startHour); %>
         <% for (let i = startHour; i <= endHour; i++) { %>
         <tr>
-          <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
-          <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
-          <% for (let j = 0; j < 7; j++) { %>
-          <% 
-          const event = schedule.find(e => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i % 24);
-          if (event) {
-            // Event exists for this cell, display it
-            const blockDuration = Math.min(4, event.endHour - i);
-            if (i >= lastEventEndHour[j]) {
-            %>
-            <td rowspan="<%= blockDuration %>" class="event">
-              <% if (blockDuration <= 4) { %>
-              <div class="event-name"><%= event.event_name %></div>
-              <div class="location"><%= event.location %></div>
-              <% } %>
-            </td>
+            <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
+            <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
+            <% for (let j = 0; j < 7; j++) { %>
             <% 
-            lastEventEndHour[j] = i + blockDuration;
-            }
-          } else if (i >= lastEventEndHour[j]) {
-            // No event for this cell, create an empty cell
+            const event = events.find(e => {
+                const eventDate = new Date(e.start.dateTime || e.start.date);
+                const eventStartHour = eventDate.getHours();
+                const eventEndHour = eventDate.getHours() + 1; // Assuming each event is one hour long
+                return eventDate.getDay() === j && eventStartHour <= i % 24 && eventEndHour > i % 24;
+            });
+            if (event) {
+                // Event exists for this cell, display it
+                const blockDuration = Math.min(4, eventEndHour - i);
+                if (i >= lastEventEndHour[j]) {
+                %>
+                <td rowspan="<%= blockDuration %>" class="event">
+                  <% if (blockDuration <= 4) { %>
+                  <div class="event-name"><%= event.summary %></div>
+                  <div class="location"><%= event.location %></div>
+                  <% } %>
+                </td>
+                <% 
+                lastEventEndHour[j] = i + blockDuration;
+                }
+            } else if (i >= lastEventEndHour[j]) {
+                // No event for this cell, create an empty cell
+                %>
+                <td></td>
+                <% 
+            } 
             %>
-            <td></td>
-            <% 
-          } 
-          %>
-          <% } %>
+            <% } %>
         </tr>
         <% } %>
-      </tbody>
+    </tbody>
+    
     </table>
     
   </div>
