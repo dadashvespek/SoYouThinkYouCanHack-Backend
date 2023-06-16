@@ -31,12 +31,7 @@ app.use(express.static(path.join(__dirname)));
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   const user_id = req.params.user_id;
   const weekOffset = Number(req.params.weekOffset) || 0; // Defaults to 0 if not provided
-  const userSchedule = req.body.userSchedule; // User schedule is now provided directly
-
-  if (!userSchedule) {
-    res.status(400).json({ error: "User schedule not provided" });
-    return;
-  }
+  const userSchedule = req.body.userSchedule || []; // Defaults to empty array if not provided
 
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + weekOffset * 7); // Apply week offset
