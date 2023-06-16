@@ -366,7 +366,7 @@ app.post("/api/users/:user_id/schedules", async (req, res) => {
 
 app.post("/savetosupabase", async (req, res) => {
   try {
-    const { user_id } = 123;
+    const { user_id } = "123";
 
     // Extract array of events from request body
     const events = req.body;
