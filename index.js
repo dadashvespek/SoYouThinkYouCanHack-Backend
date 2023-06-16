@@ -4,21 +4,6 @@ const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config();
 app.use(express.json());
 
-const { Configuration, OpenAIApi } = require("openai");
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-async function chat(message) {
-  const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo-0613",
-    messages: [{"role": "system", "content": "you are an assistant that converts natural language to the correct format json"}, {role: "user", content: `${message}`}],
-  });
-  console.log(completion.data.choices[0].message.content);
-  return completion.data.choices[0].message.content;
-}
-
 const path = require("path");
 const { start } = require("repl");
 const supabase = createClient(
@@ -157,22 +142,6 @@ if (!data) {
 
   res.json(result);
 });
-
-async function validateJson(query) {
-  if (JSON.stringify(query) === '{}') {
-    return {};
-  }
-
-  const response = await chat(`convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}, not provided json:${JSON.stringify(query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
-
-  if (response) {
-    console.log('Validated JSON:', response);
-    return JSON.parse(response);
-  } else {
-    console.error('Error occurred while validating JSON.');
-    return {};
-  }
-}
 
 function filterData(data, start_datetime, end_datetime) {
   return data.filter((entry) => {
