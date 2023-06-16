@@ -68,7 +68,17 @@ function createBlocks(entry) {
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   const { user_id, weekOffset = 0 } = req.params;
   
-  const { startOfWeek, endOfWeek } = getWeekBoundaries(Number(weekOffset));
+
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() + weekOffset * 7); // Apply week offset
+  const currentDayOfWeek = currentDate.getDay();
+
+  // Calculate start (Monday) and end (Sunday) of the week
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(startOfWeek.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1));
+
+  const endOfWeek = new Date(currentDate);
+  endOfWeek.setDate(endOfWeek.getDate() - currentDayOfWeek + 7);
 
   let { data, error } = await supabase
     .from("schedules")
