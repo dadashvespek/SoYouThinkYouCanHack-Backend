@@ -1,135 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Schedule</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      background-color: #fafafa;
-      padding: 20px;
-      color: #333;
-    }
-    
-    h1 {
-      text-align: center;
-      color: #444;
-      margin-top: 30px;
-      font-size: 28px;
-      font-weight: lighter;
-    }
-  
-    .table-container {
-      border-radius: 5px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-  
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: center;
-      background-color: #fff;
-    }
-    
-    th, td {
-      padding: 15px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
-    th {
-      background-color: #e0e0e0;
-      font-weight: bold;
-      font-size: 14px;
-      color: #444;
-      text-transform: uppercase;
-    }
-    
-    td {
-      background-color: #f9f9f9;
-      font-size: 13px;
-      color: #333;
-    }
-    
-    td:hover {
-      background-color: #eaeaea;
-    }
-    
-    td.event {
-      background-color: #ffe0b2;
-      font-weight: bold;
-      color: #333;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-  
-    td.event:hover {
-      background-color: #ffd180;
-    }
-    
-    td.event .event-name {
-      font-size: 14px;
-    }
-    
-    td.event .location {
-      font-size: 12px;
-      color: #777;
-    }
-  
-    .week-navigation {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-      padding-bottom: 20px;
-    }
-  
-    .sexy-button {
-      padding: 10px 25px;
-      background-color: #64b5f6;
-      color: #fff;
-      font-size: 14px;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-  
-    .prev-button {
-      background-color: #64b5f6;
-    }
-  
-    .next-button {
-      background-color: #81c784;
-    }
-  
-    .sexy-button:hover {
-      background-color: #42a5f5;
-      transform: scale(1.05);
-    }
-  
-    .sexy-button:active {
-      background-color: #1e88e5;
-      transform: scale(0.98);
-    }
-  
-    .sexy-button:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px #64b5f6;
-    }
-  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schedule</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Arial, sans-serif;
+        background-color: #fafafa;
+        padding: 20px;
+        color: #333;
+      }
+
+      h1 {
+        text-align: center;
+        color: #444;
+        margin-top: 30px;
+        font-size: 28px;
+        font-weight: lighter;
+      }
+
+      .table-container {
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        background-color: #fff;
+      }
+
+      th,
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      th {
+        background-color: #e0e0e0;
+        font-weight: bold;
+        font-size: 14px;
+        color: #444;
+        text-transform: uppercase;
+      }
+
+      td {
+        background-color: #f9f9f9;
+        font-size: 13px;
+        color: #333;
+      }
+
+      td:hover {
+        background-color: #eaeaea;
+      }
+
+      td.event {
+        background-color: #ffe0b2;
+        font-weight: bold;
+        color: #333;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      td.event:hover {
+        background-color: #ffd180;
+      }
+
+      td.event .event-name {
+        font-size: 14px;
+      }
+
+      td.event .location {
+        font-size: 12px;
+        color: #777;
+      }
+
+      .week-navigation {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+        padding-bottom: 20px;
+      }
+
+      .sexy-button {
+        padding: 10px 25px;
+        background-color: #64b5f6;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+
+      .prev-button {
+        background-color: #64b5f6;
+      }
+
+      .next-button {
+        background-color: #81c784;
+      }
+
+      .sexy-button:hover {
+        background-color: #42a5f5;
+        transform: scale(1.05);
+      }
+
+      .sexy-button:active {
+        background-color: #1e88e5;
+        transform: scale(0.98);
+      }
+
+      .sexy-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #64b5f6;
+      }
     </style>
-  
-</head>
-<body>
-      <p>Google Calendar API Quickstart</p>
+  </head>
+  <body>
+    <p>Google Calendar API Quickstart</p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-    
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+
+    <pre id="content" style="white-space: pre-wrap"></pre>
 
     <script type="text/javascript">
       /* exported gapiLoaded */
@@ -138,28 +137,30 @@
       /* exported handleSignoutClick */
 
       // TODO(developer): Set to client ID and API key from the Developer Console
-      const CLIENT_ID = '622225267855-0nqjtlnf9som78m8fij2qd9gkpl302nv.apps.googleusercontent.com';
-      const API_KEY = 'AIzaSyABk8-b8nybtZx7k0_GUPVCEN_U6pkhIO8';
+      const CLIENT_ID =
+        "622225267855-0nqjtlnf9som78m8fij2qd9gkpl302nv.apps.googleusercontent.com";
+      const API_KEY = "AIzaSyABk8-b8nybtZx7k0_GUPVCEN_U6pkhIO8";
 
       // Discovery doc URL for APIs used by the quickstart
-      const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+      const DISCOVERY_DOC =
+        "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest";
 
       // Authorization scopes required by the API; multiple scopes can be
       // included, separated by spaces.
-      const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+      const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
       let tokenClient;
       let gapiInited = false;
       let gisInited = false;
 
-      document.getElementById('authorize_button').style.visibility = 'hidden';
-      document.getElementById('signout_button').style.visibility = 'hidden';
+      document.getElementById("authorize_button").style.visibility = "hidden";
+      document.getElementById("signout_button").style.visibility = "hidden";
 
       /**
        * Callback after api.js is loaded.
        */
       function gapiLoaded() {
-        gapi.load('client', initializeGapiClient);
+        gapi.load("client", initializeGapiClient);
       }
 
       /**
@@ -182,7 +183,7 @@
         tokenClient = google.accounts.oauth2.initTokenClient({
           client_id: CLIENT_ID,
           scope: SCOPES,
-          callback: '', // defined later
+          callback: "", // defined later
         });
         gisInited = true;
         maybeEnableButtons();
@@ -193,7 +194,8 @@
        */
       function maybeEnableButtons() {
         if (gapiInited && gisInited) {
-          document.getElementById('authorize_button').style.visibility = 'visible';
+          document.getElementById("authorize_button").style.visibility =
+            "visible";
         }
       }
 
@@ -203,20 +205,21 @@
       function handleAuthClick() {
         tokenClient.callback = async (resp) => {
           if (resp.error !== undefined) {
-            throw (resp);
+            throw resp;
           }
-          document.getElementById('signout_button').style.visibility = 'visible';
-          document.getElementById('authorize_button').innerText = 'Refresh';
+          document.getElementById("signout_button").style.visibility =
+            "visible";
+          document.getElementById("authorize_button").innerText = "Refresh";
           await listUpcomingEvents();
         };
 
         if (gapi.client.getToken() === null) {
           // Prompt the user to select a Google Account and ask for consent to share their data
           // when establishing a new session.
-          tokenClient.requestAccessToken({prompt: 'consent'});
+          tokenClient.requestAccessToken({ prompt: "consent" });
         } else {
           // Skip display of account chooser and consent dialog for an existing session.
-          tokenClient.requestAccessToken({prompt: ''});
+          tokenClient.requestAccessToken({ prompt: "" });
         }
       }
 
@@ -227,10 +230,10 @@
         const token = gapi.client.getToken();
         if (token !== null) {
           google.accounts.oauth2.revoke(token.access_token);
-          gapi.client.setToken('');
-          document.getElementById('content').innerText = '';
-          document.getElementById('authorize_button').innerText = 'Authorize';
-          document.getElementById('signout_button').style.visibility = 'hidden';
+          gapi.client.setToken("");
+          document.getElementById("content").innerText = "";
+          document.getElementById("authorize_button").innerText = "Authorize";
+          document.getElementById("signout_button").style.visibility = "hidden";
         }
       }
 
@@ -239,137 +242,110 @@
        * the authorized user's calendar. If no events are found an
        * appropriate message is printed.
        */
-       async function listUpcomingEvents() {
-  let response;
-  try {
-    const request = {
-      'calendarId': 'primary',
-      'timeMin': (new Date()).toISOString(),
-      'showDeleted': false,
-      'singleEvents': true,
-      'maxResults': 10,
-      'orderBy': 'startTime',
-    };
-    response = await gapi.client.calendar.events.list(request);
-  } catch (err) {
-    // Handle error if necessary
-    console.error(err);
-    return;
-  }
+      async function listUpcomingEvents() {
+        let response;
+        try {
+          const request = {
+            calendarId: "primary",
+            timeMin: new Date().toISOString(),
+            showDeleted: false,
+            singleEvents: true,
+            maxResults: 10,
+            orderBy: "startTime",
+          };
+          response = await gapi.client.calendar.events.list(request);
+        } catch (err) {
+          document.getElementById("content").innerText = err.message;
+          return;
+        }
 
-  const events = response.result.items;
-  if (!events || events.length == 0) {
-    // Handle case when no events found
-    console.log('No events found.');
-    return;
-  }
-  
-  // Prepare the data to send to the other API
-  const eventData = events.map(event => ({
-    summary: event.summary,
-    start: event.start.dateTime || event.start.date,
-    end: event.end.dateTime || event.end.date,
-    location: event.location,
-    description: event.description,
-    htmlLink: event.htmlLink,
-
-  }));
-
-  // Send the data to the other API
-  try {
-    const apiResponse = await fetch('https://scary-fashion-eel.cyclic.app/api', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(eventData)
-    });
-    
-    // Handle the response from the other API if necessary
-    console.log('API response:', apiResponse);
-    try{
-        // Parsing the response to JSON
-  const parsedResponse = await apiResponse.json();
-  console.log('API response:', parsedResponse);
-
-  // Sending the parsed response to the second API
-  const secondApiResponse = await fetch(`https://scary-fashion-eel.cyclic.app/schedule/123`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ userSchedule: parsedResponse }) // Sending the schedule data to the second API
-  });
-    } catch (error) {
-    // Handle error if necessary
-    console.error(error);
-    return;
-    }
-  } catch (error) {
-    // Handle error if necessary
-    console.error(error);
-    return;
-  }
-}
+        const events = response.result.items;
+        if (!events || events.length == 0) {
+          document.getElementById("content").innerText = "No events found.";
+          return;
+        }
+        // Flatten to string to display
+        const output = events.reduce(
+          (str, event) =>
+            `${str}${event.summary} (${
+              event.start.dateTime || event.start.date
+            })\n`,
+          "Events:\n"
+        );
+        document.getElementById("content").innerText = output;
+      }
     </script>
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-  <h1>Schedule for user <%= user_id %></h1>
-  <div class="week-navigation">
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
-  </div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Monday</th>
-          <th>Tuesday</th>
-          <th>Wednesday</th>
-          <th>Thursday</th>
-          <th>Friday</th>
-          <th>Saturday</th>
-          <th>Sunday</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% let startHour = 6; let endHour = 29; %>
-        <% let lastEventEndHour = Array(7).fill(startHour); %>
-        <% for (let i = startHour; i <= endHour; i++) { %>
-        <tr>
-          <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
-          <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
-          <% for (let j = 0; j < 7; j++) { %>
-          <% 
-          const event = schedule.find(e => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i % 24);
-          if (event) {
-            // Event exists for this cell, display it
-            const blockDuration = Math.min(4, event.endHour - i);
-            if (i >= lastEventEndHour[j]) {
+    <script
+      async
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="gapiLoaded()"
+    ></script>
+    <script
+      async
+      defer
+      src="https://accounts.google.com/gsi/client"
+      onload="gisLoaded()"
+    ></script>
+    <h1>Schedule for user <%= user_id %></h1>
+    <div class="week-navigation">
+      <a
+        class="sexy-button"
+        href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>"
+        >Previous Week</a
+      >
+      <a
+        class="sexy-button"
+        href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>"
+        >Next Week</a
+      >
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+            <th>Sunday</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let startHour = 6; let endHour = 29; %> <% let lastEventEndHour =
+          Array(7).fill(startHour); %> <% for (let i = startHour; i <= endHour;
+          i++) { %>
+          <tr>
+            <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12);
             %>
+            <td>
+              <%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%=
+              (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' :
+              'PM' %>
+            </td>
+            <% for (let j = 0; j < 7; j++) { %> <% const event = schedule.find(e
+            => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i %
+            24); if (event) { // Event exists for this cell, display it const
+            blockDuration = Math.min(4, event.endHour - i); if (i >=
+            lastEventEndHour[j]) { %>
             <td rowspan="<%= blockDuration %>" class="event">
               <% if (blockDuration <= 4) { %>
               <div class="event-name"><%= event.event_name %></div>
               <div class="location"><%= event.location %></div>
               <% } %>
             </td>
-            <% 
-            lastEventEndHour[j] = i + blockDuration;
-            }
-          } else if (i >= lastEventEndHour[j]) {
-            // No event for this cell, create an empty cell
-            %>
+            <% lastEventEndHour[j] = i + blockDuration; } } else if (i >=
+            lastEventEndHour[j]) { // No event for this cell, create an empty
+            cell %>
             <td></td>
-            <% 
-          } 
-          %>
+            <% } %> <% } %>
+          </tr>
           <% } %>
-        </tr>
-        <% } %>
-      </tbody>
-    </table>
-    
-  </div>
-</body>
+        </tbody>
+      </table>
+    </div>
+  </body>
 </html>
