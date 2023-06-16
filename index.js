@@ -66,6 +66,7 @@ function createBlocks(entry) {
 }
 
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
+
   const { user_id, weekOffset = 0 } = req.params;
   
 
@@ -122,6 +123,7 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
 
 app.get("/data/:user_id", async (req, res) => {
+  console.log(`req: ${req}`)
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = await validateJson(req.query);
 
@@ -148,6 +150,7 @@ if (!data) {
   const filteredData = filterData(data, start_datetime, end_datetime);
   const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
+  console.log(`result: ${result}`)
   if (result === []) {
     res.send(`Nothing on schedule for user:${user_id}}`)
     return;
