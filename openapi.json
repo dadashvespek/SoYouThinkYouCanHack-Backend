@@ -69,55 +69,6 @@
           }
         }
       }
-    },
-    "/api/users/{user_id}/schedules": {
-      "put": {
-        "operationId": "updateUserSchedule",
-        "summary": "Update a user's schedule",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "user_id",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "The ID of the user."
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/updateUserScheduleRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/updateUserScheduleResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/errorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -140,18 +91,6 @@
               "type": "string",
               "format": "date-time",
               "description": "The end datetime of the schedule entry."
-            },
-            "location": {
-              "type": "string",
-              "description": "The location of the schedule entry."
-            },
-            "event_name": {
-              "type": "string",
-              "description": "The name of the event in the schedule entry."
-            },
-            "repeating": {
-              "type": "string",
-              "description": "The repeating status of the schedule entry."
             }
           }
         }
@@ -162,91 +101,6 @@
           "error": {
             "type": "string",
             "description": "The error message."
-          }
-        }
-      },
-      "updateUserScheduleRequest": {
-        "type": "object",
-        "properties": {
-          "old_event_name": {
-            "type": "string",
-            "description": "The old event name for identifying the schedule entry to update."
-          },
-          "old_start_datetime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The old start datetime for identifying the schedule entry to update."
-          },
-          "old_end_datetime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The old end datetime for identifying the schedule entry to update."
-          },
-          "event_name": {
-            "type": "string",
-            "description": "The new event name for the updated schedule entry."
-          },
-          "location": {
-            "type": "string",
-            "description": "The new location for the updated schedule entry."
-          },
-          "start_datetime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The new start datetime for the updated schedule entry."
-          },
-          "end_datetime": {
-            "type": "string",
-            "format": "date-time",
-            "description": "The new end datetime for the updated schedule entry."
-          },
-          "repeating": {
-            "type": "string",
-            "description": "The new repeating status for the updated schedule entry."
-          }
-        }
-      },
-      "updateUserScheduleResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "description": "Indicates whether the schedule entry was updated successfully."
-          },
-          "message": {
-            "type": "string",
-            "description": "A message describing the result of the update operation."
-          },
-          "event": {
-            "type": "object",
-            "properties": {
-              "user_id": {
-                "type": "string",
-                "description": "The ID of the user."
-              },
-              "start_datetime": {
-                "type": "string",
-                "format": "date-time",
-                "description": "The updated start datetime of the schedule entry."
-              },
-              "end_datetime": {
-                "type": "string",
-                "format": "date-time",
-                "description": "The updated end datetime of the schedule entry."
-              },
-              "location": {
-                "type": "string",
-                "description": "The updated location of the schedule entry."
-              },
-              "event_name": {
-                "type": "string",
-                "description": "The updated name of the event in the schedule entry."
-              },
-              "repeating": {
-                "type": "string",
-                "description": "The updated repeating status of the schedule entry."
-              }
-            }
           }
         }
       }
