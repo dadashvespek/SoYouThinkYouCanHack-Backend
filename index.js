@@ -123,7 +123,7 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
 
 app.get("/data/:user_id", async (req, res) => {
-  console.log(`req: ${req}`)
+  console.log(`req: ${JSON.stringify(req)}`)
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = await validateJson(req.query);
 
@@ -151,7 +151,7 @@ if (!data) {
   const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
   console.log(`result: ${result}`)
-  if (result === []) {
+  if (result === "" || result === undefined || result === null) {
     res.send(`Nothing on schedule for user:${user_id}}`)
     return;
   }
