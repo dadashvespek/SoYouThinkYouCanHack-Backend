@@ -287,6 +287,24 @@
     
     // Handle the response from the other API if necessary
     console.log('API response:', apiResponse);
+    try{
+        // Parsing the response to JSON
+  const parsedResponse = await apiResponse.json();
+  console.log('API response:', parsedResponse);
+
+  // Sending the parsed response to the second API
+  const secondApiResponse = await fetch(`https://scary-fashion-eel.cyclic.app/schedule/123`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ userSchedule: parsedResponse }) // Sending the schedule data to the second API
+  });
+    } catch (error) {
+    // Handle error if necessary
+    console.error(error);
+    return;
+    }
   } catch (error) {
     // Handle error if necessary
     console.error(error);

@@ -31,19 +31,10 @@ app.use(express.static(path.join(__dirname)));
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   const user_id = req.params.user_id;
   const weekOffset = Number(req.params.weekOffset) || 0; // Defaults to 0 if not provided
+  const userSchedule = req.body.userSchedule; // User schedule is now provided directly
 
-  let { data, error } = await supabase
-    .from("schedules")
-    .select("*")
-    .eq("user_id", user_id);
-
-  if (error) {
-    res.status(500).json({ error: "Failed to fetch data from Supabase" });
-    return;
-  }
-
-  if (!data) {
-    res.json({});
+  if (!userSchedule) {
+    res.status(400).json({ error: "User schedule not provided" });
     return;
   }
 
@@ -62,21 +53,18 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
     currentDate.setDate(currentDate.getDate() - currentDayOfWeek + 7)
   );
 
-  const weekData = data.filter((entry) => {
-    const startDateTime = new Date(entry.start_datetime);
-    if (entry.repeating === "Everyday" || entry.repeating === "Everyweek") {
-      return true;
-    } else {
-      return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
-    }
+  const weekData = userSchedule.filter((entry) => {
+    const startDateTime = new Date(entry.start);
+    return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
   });
+
   const transformedData = {
     user_id: user_id,
     weekOffset: weekOffset,
     schedule: weekData
       .flatMap((entry) => {
-        const startDateTime = new Date(entry.start_datetime);
-        const endDateTime = new Date(entry.end_datetime);
+        const startDateTime = new Date(entry.start);
+        const endDateTime = new Date(entry.end);
         const duration = (endDateTime - startDateTime) / (60 * 60 * 1000); // in hours
 
         let blocks = [];
@@ -87,39 +75,19 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
             startHour: startDateTime.getHours() + i,
             endHour: startDateTime.getHours() + i + blockDuration,
             duration: blockDuration,
-            event_name: entry.event_name,
+            event_name: entry.summary,
             location: entry.location,
           });
           i += blockDuration;
         }
-
-        if (entry.repeating === "Everyday") {
-          // Create an entry for each day of the week
-          return Array(7)
-            .fill()
-            .map((_, dayOfWeek) => {
-              return blocks.map((block) => ({
-                ...block,
-                dayOfWeek: dayOfWeek,
-              }));
-            })
-            .flat();
-        } else if (
-          entry.repeating === "Everyweek" &&
-          startDateTime.getDay() >= startOfWeek.getDay() &&
-          startDateTime.getDay() <= endOfWeek.getDay()
-        ) {
-          // Create an entry for the same day of each week
-          return blocks;
-        } else {
-          return blocks;
-        }
+        return blocks;
       })
       .flat(),
   };
 
   res.render("schedule", transformedData);
 });
+
 
 
 
