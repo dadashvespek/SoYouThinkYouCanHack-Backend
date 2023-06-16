@@ -255,7 +255,9 @@
         document.getElementById('content').innerText = err.message;
         return;
       }
-
+      console.log(`response: ${JSON.stringify(response)}`);
+      console.log(`response.result: ${JSON.stringify(response.result)}`);
+      console.log(`response.result.items: ${JSON.stringify(response.result.items)}`);
       const events = response.result.items;
       if (!events || events.length == 0) {
         document.getElementById('content').innerText = 'No events found.';
