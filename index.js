@@ -13,14 +13,7 @@ const openai = new OpenAIApi(configuration);
 async function chat(message) {
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-0613",
-    messages: [
-      {
-        role: "system",
-        content:
-          "you are an assistant that converts natural language to the correct format json",
-      },
-      { role: "user", content: `${message}` },
-    ],
+    messages: [{"role": "system", "content": "you are an assistant that converts natural language to the correct format json"}, {role: "user", content: `${message}`}],
   });
   console.log(completion.data.choices[0].message.content);
   return completion.data.choices[0].message.content;
@@ -128,55 +121,50 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   res.render("schedule", transformedData);
 });
 
+
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = await validateJson(req.query);
 
   // Build the query
-  let query = supabase.from("schedules").select("*").eq("user_id", user_id);
+  let query = supabase
+  .from("schedules")
+  .select("*")
+  .eq("user_id", user_id);
 
-  // Fetch the data from Supabase
-  let { data, error } = await query;
+// Fetch the data from Supabase
+let { data, error } = await query;
 
-  if (error) {
-    res.status(500).json({ error: "Failed to fetch data from Supabase" });
-    return;
-  }
+if (error) {
+  res.status(500).json({ error: "Failed to fetch data from Supabase" });
+  return;
+}
 
-  if (!data) {
-    res.json({});
-    return;
-  }
+if (!data) {
+  res.json({});
+  return;
+}
+
 
   const filteredData = filterData(data, start_datetime, end_datetime);
-  const consolidatedData = consolidateData(
-    filteredData,
-    start_datetime,
-    end_datetime
-  );
+  const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
 
   res.json(result);
 });
 
 async function validateJson(query) {
-  if (JSON.stringify(query) === "{}") {
+  if (JSON.stringify(query) === '{}') {
     return {};
   }
 
-  const response = await chat(
-    `convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(
-      new Date().getTime() + 24 * 60 * 60 * 1000
-    )}, not provided json:${JSON.stringify(
-      query
-    )}}, reply with ONLY ONE line which is the validated json, validated json:`
-  );
+  const response = await chat(`convert this to a formatted json, it should have this format: \`\`\`{ "start_datetime": "YYYY-MM-DDTHH:MM:SS", "end_datetime": "YYYY-MM-DDTHH:MM:SS"}\`\`\` note that today's date is ${new Date()} use this as reference, so \`tomorrow\` would be ${new Date(new Date().getTime() + 24 * 60 * 60 * 1000)}, not provided json:${JSON.stringify(query)}}, reply with ONLY ONE line which is the validated json, validated json:`);
 
   if (response) {
-    console.log("Validated JSON:", response);
+    console.log('Validated JSON:', response);
     return JSON.parse(response);
   } else {
-    console.error("Error occurred while validating JSON.");
+    console.error('Error occurred while validating JSON.');
     return {};
   }
 }
@@ -200,10 +188,7 @@ function filterData(data, start_datetime, end_datetime) {
       const windowStartWeekday = windowStart.getUTCDay();
       const windowEndWeekday = windowEnd.getUTCDay();
       // If the event's start weekday is within the range, include it
-      if (
-        windowStartWeekday <= startWeekday &&
-        startWeekday <= windowEndWeekday
-      ) {
+      if (windowStartWeekday <= startWeekday && startWeekday <= windowEndWeekday) {
         return true;
       }
     }
@@ -243,6 +228,7 @@ function filterData(data, start_datetime, end_datetime) {
   });
 }
 
+
 function consolidateData(data, start_datetime, end_datetime) {
   const windowStart = start_datetime ? new Date(start_datetime) : null;
   const windowEnd = end_datetime ? new Date(end_datetime) : null;
@@ -252,40 +238,40 @@ function consolidateData(data, start_datetime, end_datetime) {
     const startDateTime = new Date(entry.start_datetime);
     const endDateTime = new Date(entry.end_datetime);
 
-    if (entry.repeating === "Everyweek") {
-      while (startDateTime < windowStart) {
-        startDateTime.setDate(startDateTime.getDate() + 7);
-        endDateTime.setDate(endDateTime.getDate() + 7);
-      }
-      while (startDateTime > windowEnd) {
-        startDateTime.setDate(startDateTime.getDate() - 7);
-        endDateTime.setDate(endDateTime.getDate() - 7);
-      }
-    }
-
-    if (entry.repeating === "Everyday") {
-      const dateCursor = new Date(windowStart);
-
-      while (dateCursor <= windowEnd) {
-        const date = dateCursor.toISOString().split("T")[0]; // Get date in YYYY-MM-DD format
-        if (!consolidatedData[date]) {
-          consolidatedData[date] = [];
+        if (entry.repeating === 'Everyweek') {
+            while (startDateTime < windowStart) {
+                startDateTime.setDate(startDateTime.getDate() + 7);
+                endDateTime.setDate(endDateTime.getDate() + 7);
+            }
+            while (startDateTime > windowEnd) {
+                startDateTime.setDate(startDateTime.getDate() - 7);
+                endDateTime.setDate(endDateTime.getDate() - 7);
+            }
         }
 
-        consolidatedData[date].push({
-          startTime: startDateTime.getHours(),
-          endTime: endDateTime.getHours(),
-          eventName: entry.event_name,
-          location: entry.location,
-        });
+        if (entry.repeating === 'Everyday') {
+            const dateCursor = new Date(windowStart);
 
-        // Advance to next day
-        dateCursor.setDate(dateCursor.getDate() + 1);
-      }
+            while (dateCursor <= windowEnd) {
+                const date = dateCursor.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
+                if (!consolidatedData[date]) {
+                    consolidatedData[date] = [];
+                }
+                
+                consolidatedData[date].push({
+                    startTime: startDateTime.getHours(),
+                    endTime: endDateTime.getHours(),
+                    eventName: entry.event_name,
+                    location: entry.location,
+                });
 
-      // Skip the usual event addition logic for 'Everyday' events
-      return;
-    }
+                // Advance to next day
+                dateCursor.setDate(dateCursor.getDate() + 1);
+            }
+
+            // Skip the usual event addition logic for 'Everyday' events
+            return;
+        }
 
     const date = startDateTime.toISOString().split("T")[0];
     const startTime = startDateTime.getHours();
@@ -317,34 +303,37 @@ function formatResult(consolidatedData) {
 
 // Register a new user
 app.post("/api/users", async (req, res) => {
-  const { user_id, name, email, password } = req.body;
-  const { data, error } = await supabase
-    .from("users")
-    .insert([{ user_id, name, email, password }]);
+const { user_id, name, email, password } = req.body;
+const { data, error } = await supabase
+  .from("users")
+  .insert([{ user_id, name, email, password }]);
 
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
+if (error) return res.status(500).json({ error: error.message });
+return res.status(200).json(data);
 });
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
-  const { user_id } = req.params;
-  const { event_name, location, start_datetime, end_datetime, repeating } =
-    req.body;
-  const { data, error } = await supabase.from("schedules").insert([
-    {
-      user_id,
-      event_name,
-      location,
-      start_datetime,
-      end_datetime,
-      repeating,
-    },
-  ]);
+const { user_id } = req.params;
+const { event_name, location, start_datetime, end_datetime, repeating } =
+  req.body;
+const { data, error } = await supabase.from("schedules").insert([
+  {
+    user_id,
+    event_name,
+    location,
+    start_datetime,
+    end_datetime,
+    repeating,
+  },
+]);
 
-  if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json(data);
+if (error) return res.status(500).json({ error: error.message });
+return res.status(200).json(data);
 });
+
+
+
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
@@ -363,11 +352,13 @@ app.post("/api/users/:user_id/schedules", async (req, res) => {
       },
     ]);
     if (error) throw error;
-    res.status(200).json({
-      success: true,
-      message: `Event '${event_name}' was created successfully for user ${user_id}.`,
-      event: data,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${event_name}' was created successfully for user ${user_id}.`,
+        event: data,
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -382,11 +373,13 @@ app.get("/api/users/:user_id/schedules", async (req, res) => {
       .select("*")
       .eq("user_id", user_id);
     if (error) throw error;
-    res.status(200).json({
-      success: true,
-      message: `Retrieved all events for user ${user_id}.`,
-      events: data,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Retrieved all events for user ${user_id}.`,
+        events: data,
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -414,11 +407,13 @@ app.put("/api/users/:user_id/schedules", async (req, res) => {
       .eq("start_datetime", old_start_datetime)
       .eq("end_datetime", old_end_datetime);
     if (error) throw error;
-    res.status(200).json({
-      success: true,
-      message: `Event '${old_event_name}' for user ${user_id} was updated successfully.`,
-      event: data,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${old_event_name}' for user ${user_id} was updated successfully.`,
+        event: data,
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -437,11 +432,13 @@ app.delete("/api/users/:user_id/schedules", async (req, res) => {
       .eq("start_datetime", start_datetime)
       .eq("end_datetime", end_datetime);
     if (error) throw error;
-    res.status(200).json({
-      success: true,
-      message: `Event '${event_name}' for user ${user_id} was deleted successfully.`,
-      event: data,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Event '${event_name}' for user ${user_id} was deleted successfully.`,
+        event: data,
+      });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
