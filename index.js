@@ -364,6 +364,37 @@ app.post("/api/users/:user_id/schedules", async (req, res) => {
   }
 });
 
+app.post("/savetosupabase", 
+  async (req, res) => {
+    try {
+      const { user_id } = 123;
+      const { event_name, location, start_datetime, end_datetime, repeating } = 
+        req.body;
+      const { data, error } = await supabase.from("schedules").insert([
+        {
+          user_id,
+          event_name,
+          location,
+          start_datetime,
+          end_datetime,
+        },
+      ]);
+      console.log(`Event '${event_name}' was created successfully for user ${user_id}.`);
+      console.log(`data: ${data}`);
+      
+      if (error) throw error;
+      res.status(200).json({
+        success: true,
+        message: `Event '${event_name}' was created successfully for user ${user_id}.`,
+        event: data,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
+
 // Retrieve all events for a specific user
 app.get("/api/users/:user_id/schedules", async (req, res) => {
   try {
