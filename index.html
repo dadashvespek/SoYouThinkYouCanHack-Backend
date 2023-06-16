@@ -175,7 +175,7 @@ const parsedResponse = await apiResponse.json();
 console.log('API response:', parsedResponse);
 
 // Sending the parsed response to the second API
-const secondApiResponse = await fetch(`https://scary-fashion-eel.cyclic.app/schedule/123`, {
+const secondApiResponse = await fetch(`https://scary-fashion-eel.cyclic.app/api/`, {
   method: 'GET',
   headers: {
     'Content-Type': 'application/json'
