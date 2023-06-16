@@ -261,7 +261,7 @@
         console.error(err);
         return;
       }
-
+      const email = response.result.summary;
       const events = response.result.items;
       if (!events || events.length == 0) {
         // Handle case when no events found
@@ -270,6 +270,7 @@
       }
       // Prepare the data to send to the other API
       const eventData = events.map(event => ({
+        UserEmail:email,
         event_name: event.summary,
         start_datetime: event.start.dateTime || event.start.date,
         end_datetime: event.end.dateTime || event.end.date,
