@@ -246,9 +246,9 @@
       'calendarId': 'primary',
       //2 months ago
       'timeMin': (new Date(Date.now() - 5184000000)).toISOString(),
-      'showDeleted': false,
+      'showDeleted': true,
       'singleEvents': false,
-      'maxResults': 10,
+      'maxResults': 100,
       'orderBy': 'startTime',
     };
     response = await gapi.client.calendar.events.list(request);
