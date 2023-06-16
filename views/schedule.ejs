@@ -283,49 +283,58 @@
           <th>Sunday</th>
         </tr>
       </thead>
-      <tbody>
-        <% let startHour = 6; let endHour = 29; %>
-        <% let lastEventEndHour = Array(7).fill(startHour); %>
-        <% for (let i = startHour; i <= endHour; i++) { %>
-        <tr>
-            <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
-            <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
-            <% for (let j = 0; j < 7; j++) { %>
-            <% 
-            const event = events.find(e => {
-                const eventDate = new Date(e.start.dateTime || e.start.date);
-                const eventStartHour = eventDate.getHours();
-                const eventEndHour = eventDate.getHours() + 1; // Assuming each event is one hour long
-                return eventDate.getDay() === j && eventStartHour <= i % 24 && eventEndHour > i % 24;
-            });
-            if (event) {
-                // Event exists for this cell, display it
-                const blockDuration = Math.min(4, eventEndHour - i);
-                if (i >= lastEventEndHour[j]) {
-                %>
-                <td rowspan="<%= blockDuration %>" class="event">
-                  <% if (blockDuration <= 4) { %>
-                  <div class="event-name"><%= event.summary %></div>
-                  <div class="location"><%= event.location %></div>
-                  <% } %>
-                </td>
-                <% 
-                lastEventEndHour[j] = i + blockDuration;
-                }
-            } else if (i >= lastEventEndHour[j]) {
-                // No event for this cell, create an empty cell
-                %>
-                <td></td>
-                <% 
-            } 
-            %>
-            <% } %>
-        </tr>
-        <% } %>
-    </tbody>
-    
+      <tbody id="schedule_body">
+        <!-- Rows of the schedule will be filled dynamically -->
+      </tbody>
     </table>
-    
   </div>
 </body>
+
+<script type="text/javascript">
+  /**
+   * Populate the table with the schedule fetched from Google Calendar.
+   */
+  async function populateSchedule() {
+    const scheduleBody = document.getElementById('schedule_body');
+    
+    // Clear out the existing schedule
+    while (scheduleBody.firstChild) {
+      scheduleBody.removeChild(scheduleBody.firstChild);
+    }
+
+    // Get the list of events
+    const events = await listUpcomingEvents();
+
+    if (!events || events.length == 0) {
+      document.getElementById('content').innerText = 'No events found.';
+      return;
+    }
+    
+    // Iterate over the list of events
+    events.forEach(event => {
+      // Create a new row for the event
+      const row = document.createElement('tr');
+
+      // Create a cell for each day of the week
+      for (let i = 0; i < 7; i++) {
+        const cell = document.createElement('td');
+        
+        // Check if the event is on this day
+        if (event.start.dayOfWeek == i) {
+          // If it is, populate the cell with the event summary
+          cell.innerText = event.summary;
+        }
+
+        // Append the cell to the row
+        row.appendChild(cell);
+      }
+
+      // Append the row to the schedule
+      scheduleBody.appendChild(row);
+    });
+  }
+
+  // Call the function to populate the schedule once the page loads
+  window.onload = populateSchedule;
+</script>
 </html>
