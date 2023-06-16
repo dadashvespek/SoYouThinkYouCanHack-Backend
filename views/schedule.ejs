@@ -130,6 +130,8 @@
   <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
   
   <pre id="content" style="white-space: pre-wrap;"></pre>
+  <pre id="contents" style="white-space: pre-wrap;"></pre>
+  <pre id="contentss" style="white-space: pre-wrap;"></pre>
 
   <script type="text/javascript">
     /* exported gapiLoaded */
@@ -247,10 +249,13 @@
           'timeMin': (new Date()).toISOString(),
           'showDeleted': false,
           'singleEvents': true,
-          'maxResults': 10,
+          'maxResults': 20,
           'orderBy': 'startTime',
         };
         response = await gapi.client.calendar.events.list(request);
+        document.getElementById('content').innerText = `response.result.items:${JSON.stringify(response.result.items)}}`;
+        document.getElementById('contents').innerText = `response.result:${JSON.stringify(response.result)}}`;
+        document.getElementById('contentss').innerText = `response:${JSON.stringify(response)}}`;
       } catch (err) {
         // Handle error if necessary
         console.error(err);
@@ -263,8 +268,6 @@
         console.log('No events found.');
         return;
       }
-      
-      // Prepare the data to send to the other API
       // Prepare the data to send to the other API
       const eventData = events.map(event => ({
         event_name: event.summary,
