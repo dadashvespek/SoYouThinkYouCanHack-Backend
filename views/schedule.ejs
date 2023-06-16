@@ -244,11 +244,10 @@
   try {
     const request = {
       'calendarId': 'primary',
-      //2 months ago
-      'timeMin': (new Date(Date.now() - 5184000000)).toISOString(),
-      'showDeleted': true,
+      'timeMin': (new Date()).toISOString(),
+      'showDeleted': false,
       'singleEvents': false,
-      'maxResults': 100,
+      'maxResults': 10,
       'orderBy': 'startTime',
     };
     response = await gapi.client.calendar.events.list(request);
