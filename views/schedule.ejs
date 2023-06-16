@@ -265,6 +265,7 @@
       }
       
       // Prepare the data to send to the other API
+      // Prepare the data to send to the other API
       const eventData = events.map(event => ({
         event_name: event.summary,
         start_datetime: event.start.dateTime || event.start.date,
@@ -280,13 +281,17 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(eventData)
+          body: JSON.stringify({ 
+            user_id: "123",  // Add user_id here
+            events: eventData // Wrap your array inside an object
+          })
         });
       } catch (error) {
         // Handle error if necessary
         console.error(error);
         return;
       }
+
     }
   </script>
   <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>

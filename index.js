@@ -366,10 +366,14 @@ app.post("/api/users/:user_id/schedules", async (req, res) => {
 
 app.post("/savetosupabase", async (req, res) => {
   try {
-    const { user_id } = "123";
+    const { user_id, events } = req.body;
 
-    // Extract array of events from request body
-    const events = req.body;
+    // Check if user_id exists
+    if (!user_id) {
+      res.status(400).json({ error: "Missing user_id in the request body." });
+      return;
+    }
+
 
     // Prepare data for insert operation
     const insertData = events.map(event => ({
