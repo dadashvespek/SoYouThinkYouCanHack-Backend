@@ -122,6 +122,27 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 });
 
 
+
+
+
+
+app.post('/api', (req, res) => {
+  const eventData = req.body;
+
+  // Process the eventData as needed
+  console.log('Received event data:', eventData);
+
+  // Send a response back if necessary
+  res.json({ message: 'Event data received successfully' });
+});
+
+
+
+
+
+
+
+
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = await validateJson(req.query);
