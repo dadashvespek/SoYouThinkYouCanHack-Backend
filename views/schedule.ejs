@@ -259,6 +259,7 @@
       console.log(`response.result: ${JSON.stringify(response.result)}`);
       console.log(`response.result.items: ${JSON.stringify(response.result.items)}`);
       const events = response.result.items;
+      console.log(`events: ${JSON.stringify(events)}`);
       if (!events || events.length == 0) {
         document.getElementById('content').innerText = 'No events found.';
         return;
