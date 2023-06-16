@@ -11,19 +11,19 @@
     }
   ],
   "paths": {
-    "/data/{user_id}?{params}": {
+    "/data/{user_email}?{params}": {
       "get": {
-        "operationId": "getSchedule",
+        "operationId": "getScheduleByEmail",
         "summary": "Fetch and filter user schedule data",
         "parameters": [
           {
             "in": "path",
-            "name": "user_id",
+            "name": "user_email",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The ID of the user."
+            "description": "The email of the user."
           },
           {
             "in": "query",
