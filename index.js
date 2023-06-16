@@ -28,9 +28,47 @@ const supabase = createClient(
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname)));
+const DAYS_IN_WEEK = 7;
+const BLOCK_DURATION = 4;
+
+// Function to get the start and end dates of a week
+function getWeekBoundaries(weekOffset) {
+  const currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() + weekOffset * DAYS_IN_WEEK);
+  const currentDayOfWeek = currentDate.getDay();
+  
+  const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)));
+  const endOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + DAYS_IN_WEEK));
+
+  return { startOfWeek, endOfWeek };
+}
+
+// Function to create the blocks for a given entry
+function createBlocks(entry) {
+  const startDateTime = new Date(entry.start_datetime);
+  const endDateTime = new Date(entry.end_datetime);
+  const duration = (endDateTime - startDateTime) / (60 * 60 * 1000); // in hours
+
+  let blocks = [];
+  for (let i = 0; i < duration; i += BLOCK_DURATION) {
+    const blockDuration = Math.min(BLOCK_DURATION, duration - i);
+    blocks.push({
+      dayOfWeek: startDateTime.getDay(),
+      startHour: startDateTime.getHours() + i,
+      endHour: startDateTime.getHours() + i + blockDuration,
+      duration: blockDuration,
+      event_name: entry.event_name,
+      location: entry.location,
+    });
+  }
+  
+  return blocks;
+}
+
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
-  const user_id = req.params.user_id;
-  const weekOffset = Number(req.params.weekOffset) || 0; // Defaults to 0 if not provided
+  const { user_id, weekOffset = 0 } = req.params;
+  
+  const { startOfWeek, endOfWeek } = getWeekBoundaries(Number(weekOffset));
 
   let { data, error } = await supabase
     .from("schedules")
@@ -38,88 +76,40 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
     .eq("user_id", user_id);
 
   if (error) {
-    res.status(500).json({ error: "Failed to fetch data from Supabase" });
-    return;
+    return res.status(500).json({ error: "Failed to fetch data from Supabase" });
   }
 
   if (!data) {
-    res.json({});
-    return;
+    return res.json({});
   }
-
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() + weekOffset * 7); // Apply week offset
-  const currentDayOfWeek = currentDate.getDay();
-  // Calculate start (Monday) and end (Sunday) of the week
-  const startOfWeek = new Date(
-    currentDate.setDate(
-      currentDate.getDate() -
-        currentDayOfWeek +
-        (currentDayOfWeek === 0 ? -6 : 1)
-    )
-  );
-  const endOfWeek = new Date(
-    currentDate.setDate(currentDate.getDate() - currentDayOfWeek + 7)
-  );
 
   const weekData = data.filter((entry) => {
     const startDateTime = new Date(entry.start_datetime);
-    if (entry.repeating === "Everyday" || entry.repeating === "Everyweek") {
-      return true;
-    } else {
-      return startDateTime >= startOfWeek && startDateTime <= endOfWeek;
-    }
+    const isEverydayOrEveryweek = ["Everyday", "Everyweek"].includes(entry.repeating);
+    
+    return isEverydayOrEveryweek || (startDateTime >= startOfWeek && startDateTime <= endOfWeek);
   });
+
   const transformedData = {
-    user_id: user_id,
-    weekOffset: weekOffset,
-    schedule: weekData
-      .flatMap((entry) => {
-        const startDateTime = new Date(entry.start_datetime);
-        const endDateTime = new Date(entry.end_datetime);
-        const duration = (endDateTime - startDateTime) / (60 * 60 * 1000); // in hours
+    user_id,
+    weekOffset,
+    schedule: weekData.flatMap((entry) => {
+      const blocks = createBlocks(entry);
+      const startDateTime = new Date(entry.start_datetime);
 
-        let blocks = [];
-        for (let i = 0; i < duration; ) {
-          const blockDuration = Math.min(4, duration - i);
-          blocks.push({
-            dayOfWeek: startDateTime.getDay(),
-            startHour: startDateTime.getHours() + i,
-            endHour: startDateTime.getHours() + i + blockDuration,
-            duration: blockDuration,
-            event_name: entry.event_name,
-            location: entry.location,
-          });
-          i += blockDuration;
-        }
-
-        if (entry.repeating === "Everyday") {
-          // Create an entry for each day of the week
-          return Array(7)
-            .fill()
-            .map((_, dayOfWeek) => {
-              return blocks.map((block) => ({
-                ...block,
-                dayOfWeek: dayOfWeek,
-              }));
-            })
-            .flat();
-        } else if (
-          entry.repeating === "Everyweek" &&
-          startDateTime.getDay() >= startOfWeek.getDay() &&
-          startDateTime.getDay() <= endOfWeek.getDay()
-        ) {
-          // Create an entry for the same day of each week
-          return blocks;
-        } else {
-          return blocks;
-        }
-      })
-      .flat(),
+      if (entry.repeating === "Everyday") {
+        return Array(DAYS_IN_WEEK).fill().map((_, dayOfWeek) => blocks.map(block => ({ ...block, dayOfWeek }))).flat();
+      } else if (entry.repeating === "Everyweek" && startDateTime.getDay() >= startOfWeek.getDay() && startDateTime.getDay() <= endOfWeek.getDay()) {
+        return blocks;
+      } else {
+        return blocks;
+      }
+    }),
   };
 
   res.render("schedule", transformedData);
 });
+
 
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
