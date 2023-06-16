@@ -300,7 +300,7 @@ function consolidateData(data, start_datetime, end_datetime) {
 function formatResult(consolidatedData) {
   return Object.entries(consolidatedData).map(([date, events]) => {
     const eventSummaries = events.map((event) => {
-      return `${event.startTime}-${event.endTime}: ${event.eventName} ${event.location? "at" + event.location : 'TBD'}`;
+      return `${event.startTime}-${event.endTime}: ${event.eventName} ${event.location? "at" + event.location : ''}`;
     });
     return `${date}: ${eventSummaries.join(", ")}`;
   });
