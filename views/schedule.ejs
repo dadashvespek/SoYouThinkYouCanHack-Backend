@@ -123,63 +123,6 @@
   
 </head>
 <body>
-  <h1>Schedule for user <%= user_id %></h1>
-  <div class="week-navigation">
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
-    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
-  </div>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Monday</th>
-          <th>Tuesday</th>
-          <th>Wednesday</th>
-          <th>Thursday</th>
-          <th>Friday</th>
-          <th>Saturday</th>
-          <th>Sunday</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% let startHour = 6; let endHour = 29; %>
-        <% let lastEventEndHour = Array(7).fill(startHour); %>
-        <% for (let i = startHour; i <= endHour; i++) { %>
-        <tr>
-          <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
-          <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
-          <% for (let j = 0; j < 7; j++) { %>
-          <% 
-          const event = schedule.find(e => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i % 24);
-          if (event) {
-            // Event exists for this cell, display it
-            const blockDuration = Math.min(4, event.endHour - i);
-            if (i >= lastEventEndHour[j]) {
-            %>
-            <td rowspan="<%= blockDuration %>" class="event">
-              <% if (blockDuration <= 4) { %>
-              <div class="event-name"><%= event.event_name %></div>
-              <div class="location"><%= event.location %></div>
-              <% } %>
-            </td>
-            <% 
-            lastEventEndHour[j] = i + blockDuration;
-            }
-          } else if (i >= lastEventEndHour[j]) {
-            // No event for this cell, create an empty cell
-            %>
-            <td></td>
-            <% 
-          } 
-          %>
-          <% } %>
-        </tr>
-        <% } %>
-      </tbody>
-    </table>
-    
-  </div>
   <p>Google Calendar API Quickstart</p>
 
   <!--Add buttons to initiate auth sequence and sign out-->
@@ -327,5 +270,63 @@
   </script>
   <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
   <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  <h1>Schedule for user <%= user_id %></h1>
+  <div class="week-navigation">
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset - 1 %>">Previous Week</a>
+    <a class="sexy-button" href="/schedule/<%= user_id %>/<%= weekOffset + 1 %>">Next Week</a>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+          <th>Sunday</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let startHour = 6; let endHour = 29; %>
+        <% let lastEventEndHour = Array(7).fill(startHour); %>
+        <% for (let i = startHour; i <= endHour; i++) { %>
+        <tr>
+          <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12); %>
+          <td><%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%= (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' : 'PM' %></td>
+          <% for (let j = 0; j < 7; j++) { %>
+          <% 
+          const event = schedule.find(e => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i % 24);
+          if (event) {
+            // Event exists for this cell, display it
+            const blockDuration = Math.min(4, event.endHour - i);
+            if (i >= lastEventEndHour[j]) {
+            %>
+            <td rowspan="<%= blockDuration %>" class="event">
+              <% if (blockDuration <= 4) { %>
+              <div class="event-name"><%= event.event_name %></div>
+              <div class="location"><%= event.location %></div>
+              <% } %>
+            </td>
+            <% 
+            lastEventEndHour[j] = i + blockDuration;
+            }
+          } else if (i >= lastEventEndHour[j]) {
+            // No event for this cell, create an empty cell
+            %>
+            <td></td>
+            <% 
+          } 
+          %>
+          <% } %>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+    
+  </div>
+
 </body>
 </html>
