@@ -86,7 +86,12 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   const weekData = data.filter((entry) => {
     const startDateTime = new Date(entry.start_datetime);
     const isEverydayOrEveryweek = ["Everyday", "Everyweek"].includes(entry.repeating);
-    
+    console.log(`isEverydayOrEveryweek: ${isEverydayOrEveryweek}`)
+    console.log(`startDateTime: ${startDateTime}`)
+    console.log(`startOfWeek: ${startOfWeek}`)
+    console.log(`endOfWeek: ${endOfWeek}`)
+    console.log(`event_name: ${entry.event_name}`)
+    console.log(isEverydayOrEveryweek || (startDateTime >= startOfWeek && startDateTime <= endOfWeek))
     return isEverydayOrEveryweek || (startDateTime >= startOfWeek && startDateTime <= endOfWeek);
   });
 
