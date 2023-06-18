@@ -156,7 +156,7 @@ app.get("/data/:user_id", async (req, res) => {
     return;
   }
 
-  console.log(`data: ${data}`);
+  console.log(JSON.stringify(data, null, 2));
 
   // console.log(`filterData: ${filterData(data, start_datetime, end_datetime)}`);
   const filteredData = filterData(data, start_datetime, end_datetime);
