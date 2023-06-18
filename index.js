@@ -230,11 +230,11 @@ function consolidateData(data, start_datetime, end_datetime) {
           consolidatedData[date] = [];
         }
 
+        const allDay =
+          startDateTime.getHours() === 0 && endDateTime.getHours() === 0;
         consolidatedData[date].push({
-          allDay:
-            startDateTime.getHours() === 0 && endDateTime.getHours() === 0,
-          startTime: startDateTime.getHours(),
-          endTime: endDateTime.getHours(),
+          startTime: allDay ? "All day" : startDateTime.getHours(),
+          endTime: allDay ? "All day" : endDateTime.getHours(),
           eventName: entry.event_name,
           location: entry.location,
         });
@@ -248,17 +248,16 @@ function consolidateData(data, start_datetime, end_datetime) {
     }
 
     const date = startDateTime.toISOString().split("T")[0];
-    const startTime = startDateTime.getHours();
-    const endTime = endDateTime.getHours();
+    const allDay =
+      startDateTime.getHours() === 0 && endDateTime.getHours() === 0;
 
     if (!consolidatedData[date]) {
       consolidatedData[date] = [];
     }
 
     consolidatedData[date].push({
-      allDay: startTime === 0 && endTime === 0,
-      startTime,
-      endTime,
+      startTime: allDay ? "All day" : startDateTime.getHours(),
+      endTime: allDay ? "All day" : endDateTime.getHours(),
       eventName: entry.event_name,
       location: entry.location,
     });
