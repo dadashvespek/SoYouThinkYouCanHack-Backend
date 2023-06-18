@@ -11,19 +11,19 @@
     }
   ],
   "paths": {
-    "/data/{user_email}?start_datetime={start_datetime}&end_datetime={end_datetime}": {
+    "/data/{user_name}?start_datetime={start_datetime}&end_datetime={end_datetime}": {
       "get": {
-        "operationId": "getScheduleByEmail",
+        "operationId": "getScheduleByname",
         "summary": "Fetch and filter user schedule data",
         "parameters": [
           {
             "in": "path",
-            "name": "user_email",
+            "name": "user_name",
             "schema": {
               "type": "string"
             },
             "required": true,
-            "description": "The email of the user."
+            "description": "The name of the user."
           },
           {
             "in": "path",
