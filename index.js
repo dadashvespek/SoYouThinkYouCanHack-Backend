@@ -168,18 +168,20 @@ function filterData(data, start_datetime, end_datetime) {
     }
 
     if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      startDateTime = new Date(`${start_datetime}T00:00:00`);
+      if (start_datetime.length == 10) { // This means it's a date without time
+        startDateTime = new Date(`${start_datetime}T00:00:00`);
+      } else { // This means it's a time without date
+        startDateTime = new Date(`${currentDate}T${start_datetime}`);
+      }
     }
     if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      endDateTime = new Date(`${end_datetime}T23:59:59`);
+      if (end_datetime.length == 10) { // This means it's a date without time
+        endDateTime = new Date(`${end_datetime}T23:59:59`);
+      } else { // This means it's a time without date
+        endDateTime = new Date(`${currentDate}T${end_datetime}`);
+      }
     }
-
-    if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      startDateTime = new Date(`${currentDate}T${start_datetime}`);
-    }
-    if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      endDateTime = new Date(`${currentDate}T${end_datetime}`);
-    }
+    
 
     if (start_datetime && end_datetime) {
       const windowStart = new Date(start_datetime);
