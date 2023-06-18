@@ -167,8 +167,13 @@ app.get("/data/:user_id", async (req, res) => {
   );
   const result = formatResult(consolidatedData);
   // console.log(`result: ${result}`);
-  if (result === "" || result === undefined || result === null) {
-    res.send(`Nothing on schedule for user:${user_id}}`);
+  if (
+    result === "" ||
+    result === undefined ||
+    result === null ||
+    result === []
+  ) {
+    res.send(`No schedule data found for the given time frame:${user_id}}`);
     return;
   }
 
