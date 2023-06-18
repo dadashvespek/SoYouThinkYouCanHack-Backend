@@ -234,7 +234,7 @@ function consolidateData(data, start_datetime, end_datetime) {
           startDateTime.getHours() === 0 && endDateTime.getHours() === 0;
         consolidatedData[date].push({
           startTime: allDay ? "All day" : startDateTime.getHours(),
-          endTime: allDay ? null : endDateTime.getHours(),
+          endTime: allDay ? "" : endDateTime.getHours(),
           eventName: entry.event_name,
           location: entry.location,
         });
@@ -257,7 +257,7 @@ function consolidateData(data, start_datetime, end_datetime) {
 
     consolidatedData[date].push({
       startTime: allDay ? "All day" : startDateTime.getHours(),
-      endTime: allDay ? null : endDateTime.getHours(),
+      endTime: allDay ? "" : endDateTime.getHours(),
       eventName: entry.event_name,
       location: entry.location,
     });
@@ -271,7 +271,11 @@ function consolidateData(data, start_datetime, end_datetime) {
 function formatResult(consolidatedData) {
   return Object.entries(consolidatedData).map(([date, events]) => {
     const eventSummaries = events.map((event) => {
-      return `${event.startTime}-${event.endTime}: ${event.eventName} ${
+      const timeFormat =
+        event.startTime === "All day"
+          ? "All day"
+          : `${event.startTime}-${event.endTime}`;
+      return `${timeFormat}: ${event.eventName} ${
         event.location ? "at" + event.location : ""
       }`;
     });
