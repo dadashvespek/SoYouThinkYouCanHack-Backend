@@ -134,7 +134,7 @@ if (!data) {
   return;
 }
 
-  console.log(`filteredData: ${filteredData(data, start_datetime, end_datetime)}`)
+  console.log(`filterData: ${filterData(data, start_datetime, end_datetime)}`)
   const filteredData = filterData(data, start_datetime, end_datetime);
   const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
