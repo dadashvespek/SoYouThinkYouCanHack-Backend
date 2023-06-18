@@ -193,7 +193,9 @@ function filterData(data, start_datetime, end_datetime) {
       (eventEnd >= start && eventEnd <= end)
     );
   });
-
+  console.log(`starttime: ${start}`);
+  console.log(`endtime: ${end}`);
+  console.log(`filteredData: ${filteredData}`);
   return filteredData;
 }
 
