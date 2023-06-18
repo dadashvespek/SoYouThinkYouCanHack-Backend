@@ -28,6 +28,7 @@ function getWeekBoundaries(weekOffset) {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + weekOffset * DAYS_IN_WEEK);
   const currentDayOfWeek = currentDate.getDay();
+  console.log(`currentDayOfWeek: ${currentDayOfWeek}`)
 
   const startOfWeek = new Date(
     currentDate.setDate(
