@@ -16,6 +16,11 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname)));
 const DAYS_IN_WEEK = 7;
 const BLOCK_DURATION = 4;
+function Proper(str) {
+  return str.replace(/\b\w/g, function(l) {
+    return l.toUpperCase();
+  });
+}
 
 // Function to get the start and end dates of a week
 function getWeekBoundaries(weekOffset) {
@@ -71,14 +76,16 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   startOfWeek.setDate(
     startOfWeek.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)
   );
+  console.log(`startofweek: ${startOfWeek}`)
 
   const endOfWeek = new Date(currentDate);
   endOfWeek.setDate(endOfWeek.getDate() - currentDayOfWeek + 7);
+  console.log(`endofweek: ${endOfWeek}`)
 
   let { data, error } = await supabase
     .from("schedules")
     .select("*")
-    .eq("user_id", user_id);
+    .eq("user_id", Proper(user_id));
 
   if (error) {
     return res
@@ -141,7 +148,7 @@ app.get("/data/:user_id", async (req, res) => {
   console.log(`end_datetime: ${end_datetime}`);
 
   // Build the query
-  let query = supabase.from("schedules").select("*").eq("user_id", user_id);
+  let query = supabase.from("schedules").select("*").eq("user_id", Proper(user_id));
 
   // Fetch the data from Supabase
   let { data, error } = await query;
