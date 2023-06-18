@@ -6,6 +6,7 @@ app.use(express.json());
 
 const path = require("path");
 const { start } = require("repl");
+const { log } = require("console");
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
@@ -133,7 +134,7 @@ if (!data) {
   return;
 }
 
-
+  console.log(`filteredData: ${filteredData}`)
   const filteredData = filterData(data, start_datetime, end_datetime);
   const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
   const result = formatResult(consolidatedData);
@@ -162,9 +163,6 @@ function filterData(data, start_datetime, end_datetime) {
     console.log(`currentDateTime:${currentDateTime}`)
     console.log(`currentDate:${currentDate}`)
 
-    console.log(`is event larger than start_datetime? ${startDateTime >= start_datetime}`)
-    console.log(`is event smaller than end_datetime? ${endDateTime <= end_datetime}`)
-    
 
     if (entry.repeating === "Everyday") {
       return true;
@@ -201,17 +199,27 @@ function filterData(data, start_datetime, end_datetime) {
     if (start_datetime && end_datetime) {
       const windowStart = new Date(start_datetime);
       const windowEnd = new Date(end_datetime);
+      console.log(`there is a start_datetime and end_datetime`)
+      console.log(`windowStart: ${windowStart}`)
+      console.log(`windowEnd: ${windowEnd}`)
       if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
         return false;
       }
     } else if (start_datetime) {
+      console.log(`there is only a start_datetime`)
+      console.log(`start_datetime: ${start_datetime}`)
+
       const windowStart = new Date(start_datetime);
       if (!(startDateTime >= windowStart)) {
+        console.log(`startDateTime: ${startDateTime} is not greater than windowStart: ${windowStart}`)
+        console.log(`start_datetime: ${start_datetime}`)
         return false;
       }
     } else if (end_datetime) {
+      console.log(`there is only a end_datetime`)
       const windowEnd = new Date(end_datetime);
       if (!(endDateTime <= windowEnd)) {
+        console.log(`endDateTime: ${endDateTime} is not less than windowEnd: ${windowEnd}`)
         return false;
       }
     }
