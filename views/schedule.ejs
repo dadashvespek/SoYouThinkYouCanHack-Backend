@@ -351,38 +351,22 @@
           </tr>
         </thead>
         <tbody>
-          <% var startHour = 6; var endHour = 29; %> <% var lastEventEndHour =
-          Array(7).fill(startHour); %>
-
-          <!-- All day events row -->
+          <% let startHour = 6; let endHour = 29; %> <% let lastEventEndHour =
+          Array(7).fill(startHour); %> <% for (let i = startHour; i <= endHour;
+          i++) { %>
           <tr>
-            <td>All day</td>
-            <% for (var j = 0; j < 7; j++) { %> <% var allDayEvent =
-            schedule.find(function(e) { return e.dayOfWeek === j && e.allDay });
-            if (allDayEvent) { %>
-            <td class="event">
-              <div class="event-name"><%= allDayEvent.event_name %></div>
-              <div class="location"><%= allDayEvent.location %></div>
-            </td>
-            <% } else { %>
-            <td></td>
-            <% } %> <% } %>
-          </tr>
-
-          <% for (var i = startHour; i <= endHour; i++) { %>
-          <tr>
-            <% var displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12);
+            <% const displayHour = i === 24 ? 12 : (i % 12 === 0 ? 12 : i % 12);
             %>
             <td>
               <%= displayHour %>:00 <%= i < 12 || i >= 24 ? 'AM' : 'PM' %> - <%=
               (displayHour + 1) %>:00 <%= (i + 1) < 12 || (i + 1) >= 24 ? 'AM' :
               'PM' %>
             </td>
-            <% for (var j = 0; j < 7; j++) { %> <% var event =
-            schedule.find(function(e) { return e.dayOfWeek === j && e.startHour
-            <= i % 24 && e.endHour > i % 24 && !e.allDay }); if (event) { //
-            Event exists for this cell, display it var blockDuration =
-            Math.min(4, event.endHour - i); if (i >= lastEventEndHour[j]) { %>
+            <% for (let j = 0; j < 7; j++) { %> <% const event = schedule.find(e
+            => e.dayOfWeek === j && e.startHour <= i % 24 && e.endHour > i %
+            24); if (event) { // Event exists for this cell, display it const
+            blockDuration = Math.min(4, event.endHour - i); if (i >=
+            lastEventEndHour[j]) { %>
             <td rowspan="<%= blockDuration %>" class="event">
               <% if (blockDuration <= 4) { %>
               <div class="event-name"><%= event.event_name %></div>
