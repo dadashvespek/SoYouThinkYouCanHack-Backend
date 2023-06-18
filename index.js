@@ -231,6 +231,8 @@ function consolidateData(data, start_datetime, end_datetime) {
         }
 
         consolidatedData[date].push({
+          allDay:
+            startDateTime.getHours() === 0 && endDateTime.getHours() === 0,
           startTime: startDateTime.getHours(),
           endTime: endDateTime.getHours(),
           eventName: entry.event_name,
@@ -254,6 +256,7 @@ function consolidateData(data, start_datetime, end_datetime) {
     }
 
     consolidatedData[date].push({
+      allDay: startTime === 0 && endTime === 0,
       startTime,
       endTime,
       eventName: entry.event_name,
