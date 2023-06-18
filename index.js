@@ -261,6 +261,8 @@ function consolidateData(data, start_datetime, end_datetime) {
     });
   });
 
+  console.log(`consolidatedData: ${JSON.stringify(consolidatedData)}`);
+
   return consolidatedData;
 }
 
