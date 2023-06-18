@@ -150,6 +150,15 @@ function filterData(data, start_datetime, end_datetime) {
     const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
     let startDateTime = new Date(entry.start_datetime);
     let endDateTime = new Date(entry.end_datetime);
+    console.log(`startDateTime:${startDateTime}`)
+    console.log(`endDateTime:${endDateTime}`)
+    console.log(`currentDateTime:${currentDateTime}`)
+    console.log(`currentDate:${currentDate}`)
+    console.log(`start_datetime:${start_datetime}`)
+    console.log(`end_datetime:${end_datetime}`)
+    console.log(`is event larger than start_datetime? ${startDateTime >= start_datetime}`)
+    console.log(`is event smaller than end_datetime? ${endDateTime <= end_datetime}`)
+    
 
     if (entry.repeating === "Everyday") {
       return true;
