@@ -253,9 +253,6 @@
           'orderBy': 'startTime',
         };
         response = await gapi.client.calendar.events.list(request);
-        document.getElementById('content').innerText = `response.result.items:${JSON.stringify(response.result.items)}}`;
-        document.getElementById('contents').innerText = `response.result:${JSON.stringify(response.result)}}`;
-        document.getElementById('contentss').innerText = `response:${JSON.stringify(response)}}`;
       } catch (err) {
         // Handle error if necessary
         console.error(err);
