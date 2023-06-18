@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/data/{user_email}": {
+    "/data/{user_email}?start_datetime={start_datetime}Z&end_datetime={end_datetime}": {
       "get": {
         "operationId": "getScheduleByEmail",
         "summary": "Fetch and filter user schedule data",
@@ -26,7 +26,7 @@
             "description": "The email of the user."
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "start_datetime",
             "schema": {
               "type": "string",
@@ -36,7 +36,7 @@
             "description": "The start datetime for filtering the data."
           },
           {
-            "in": "query",
+            "in": "path",
             "name": "end_datetime",
             "schema": {
               "type": "string",
