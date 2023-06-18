@@ -109,7 +109,6 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
-  console.log(`req.query: ${JSON.parse(req.query)}`)
   const { start_datetime, end_datetime } = req.query;
   console.log(`start_datetime: ${start_datetime}`)
   console.log(`end_datetime: ${end_datetime}`)
