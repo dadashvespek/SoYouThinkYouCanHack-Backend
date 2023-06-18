@@ -171,7 +171,7 @@ app.get("/data/:user_id", async (req, res) => {
     result === "" ||
     result === undefined ||
     result === null ||
-    result === []
+    (Array.isArray(result) && result.length === 0)
   ) {
     res.send(`No schedule data found for the given time frame:${user_id}}`);
     return;
