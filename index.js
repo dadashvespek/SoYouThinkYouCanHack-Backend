@@ -16,6 +16,7 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname)));
 const DAYS_IN_WEEK = 7;
 const BLOCK_DURATION = 4;
+
 function Proper(str) {
   return str.replace(/\b\w/g, function(l) {
     return l.toUpperCase();
@@ -65,22 +66,25 @@ function createBlocks(entry) {
 }
 
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
-  const { user_id, weekOffset = 0 } = req.params;
-
+  let { user_id, weekOffset = 0 } = req.params;
+  user_id = Proper(user_id);
+  
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + weekOffset * 7); // Apply week offset
   const currentDayOfWeek = currentDate.getDay();
 
-  // Calculate start (Monday) and end (Sunday) of the week
+  // Calculate start (Monday) of the week
   const startOfWeek = new Date(currentDate);
   startOfWeek.setDate(
     startOfWeek.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)
   );
-  console.log(`startofweek: ${startOfWeek}`)
-
-  const endOfWeek = new Date(currentDate);
-  endOfWeek.setDate(endOfWeek.getDate() - currentDayOfWeek + 7);
-  console.log(`endofweek: ${endOfWeek}`)
+  
+  // Calculate end (Sunday) of the week
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  
+  console.log(`startofweek: ${startOfWeek}`);
+  console.log(`endofweek: ${endOfWeek}`);
 
   let { data, error } = await supabase
     .from("schedules")
