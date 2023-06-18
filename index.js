@@ -203,6 +203,9 @@ function filterData(data, start_datetime, end_datetime) {
       console.log(`windowStart: ${windowStart}`)
       console.log(`windowEnd: ${windowEnd}`)
       if (!(startDateTime >= windowStart && endDateTime <= windowEnd)) {
+        console.log(`is startDateTime after windowStart: ${startDateTime >= windowStart}`)
+        console.log(`is endDateTime before windowEnd: ${endDateTime <= windowEnd}`)
+        
         return false;
       }
     } else if (start_datetime) {
