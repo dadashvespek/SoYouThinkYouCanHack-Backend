@@ -253,6 +253,7 @@
           'orderBy': 'startTime',
         };
         response = await gapi.client.calendar.events.list(request);
+        document.getElementById('content').innerText = `Schedule added, refresh the page, you dont need to authorize again.`;
       } catch (err) {
         // Handle error if necessary
         console.error(err);
