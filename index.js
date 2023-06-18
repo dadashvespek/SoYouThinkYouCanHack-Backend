@@ -157,8 +157,8 @@ function filterData(data, start_datetime, end_datetime) {
     console.log(`start_datetime from open assistant:${start_datetime}`)
     console.log(`end_datetime from open assistant:${end_datetime}`)
 
-    console.log(`startDateTime:${startDateTime}`)
-    console.log(`endDateTime:${endDateTime}`)
+    console.log(`database schedule event startDateTime:${startDateTime}`)
+    console.log(`database schedule event endDateTime:${endDateTime}`)
     console.log(`currentDateTime:${currentDateTime}`)
     console.log(`currentDate:${currentDate}`)
 
