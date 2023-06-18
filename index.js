@@ -176,103 +176,25 @@ app.get("/data/:user_id", async (req, res) => {
 });
 
 function filterData(data, start_datetime, end_datetime) {
-  return data.filter((entry) => {
-    const currentDateTime = new Date();
-    const currentDate = currentDateTime.toISOString().split("T")[0];
-    const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
-    let startDateTime = new Date(entry.start_datetime);
-    let endDateTime = new Date(entry.end_datetime);
+  // Parse input strings into Date objects
+  let start = new Date(start_datetime);
+  let end = new Date(end_datetime);
 
-    console.log(`start_datetime from open assistant:${start_datetime}`);
-    console.log(`end_datetime from open assistant:${end_datetime}`);
+  // Filter data
+  let filteredData = data.filter((event) => {
+    // Parse event datetime strings into Date objects
+    let eventStart = new Date(event.start_datetime);
+    let eventEnd = new Date(event.end_datetime);
 
-    console.log(
-      `database schedule event ${entry.event_name} startDateTime:${startDateTime}`
+    // Check if event falls within the given period
+    // An event is considered within the period if it starts or ends within the period
+    return (
+      (eventStart >= start && eventStart <= end) ||
+      (eventEnd >= start && eventEnd <= end)
     );
-    console.log(
-      `database schedule event ${entry.event_name} endDateTime:${endDateTime}`
-    );
-    console.log(`currentDateTime:${currentDateTime}`);
-    console.log(`currentDate:${currentDate}`);
-
-    if (entry.repeating === "Everyday") {
-      return true;
-    }
-
-    if (entry.repeating === "Everyweek") {
-      const startWeekday = startDateTime.getUTCDay();
-      const windowStart = new Date(start_datetime || `${currentDate}T00:00:00`);
-      const windowEnd = new Date(end_datetime || `${currentDate}T23:59:59`);
-      const windowStartWeekday = windowStart.getUTCDay();
-      const windowEndWeekday = windowEnd.getUTCDay();
-      // If the event's start weekday is within the range, include it
-      if (
-        windowStartWeekday <= startWeekday &&
-        startWeekday <= windowEndWeekday
-      ) {
-        return true;
-      }
-    }
-
-    if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      if (start_datetime.length == 10) {
-        // This means it's a date without time
-        startDateTime = new Date(`${start_datetime}T00:00:00`);
-      } else {
-        // This means it's a time without date
-        startDateTime = new Date(`${currentDate}T${start_datetime}`);
-      }
-    }
-    if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      if (end_datetime.length == 10) {
-        // This means it's a date without time
-        endDateTime = new Date(`${end_datetime}T23:59:59`);
-      } else {
-        // This means it's a time without date
-        endDateTime = new Date(`${currentDate}T${end_datetime}`);
-      }
-    }
-
-    if (start_datetime && end_datetime) {
-      const windowStart = new Date(start_datetime);
-      const windowEnd = new Date(end_datetime);
-      console.log(`there is a start_datetime and end_datetime`);
-      console.log(`windowStart: ${windowStart}`);
-      console.log(`windowEnd: ${windowEnd}`);
-      if (!(endDateTime >= windowStart && startDateTime <= windowEnd)) {
-        console.log(
-          `is startDateTime after windowStart: ${startDateTime >= windowStart}`
-        );
-        console.log(
-          `is endDateTime before windowEnd: ${endDateTime <= windowEnd}`
-        );
-
-        return false;
-      }
-    } else if (start_datetime) {
-      console.log(`there is only a start_datetime`);
-      console.log(`start_datetime: ${start_datetime}`);
-
-      const windowStart = new Date(start_datetime);
-      if (!(startDateTime >= windowStart)) {
-        console.log(
-          `startDateTime: ${startDateTime} is not greater than windowStart: ${windowStart}`
-        );
-        console.log(`start_datetime: ${start_datetime}`);
-        return false;
-      }
-    } else if (end_datetime) {
-      console.log(`there is only a end_datetime`);
-      const windowEnd = new Date(end_datetime);
-      if (!(endDateTime <= windowEnd)) {
-        console.log(
-          `endDateTime: ${endDateTime} is not less than windowEnd: ${windowEnd}`
-        );
-        return false;
-      }
-    }
-    return true;
   });
+
+  return filteredData;
 }
 
 function consolidateData(data, start_datetime, end_datetime) {
