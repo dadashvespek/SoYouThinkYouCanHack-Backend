@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/data/{user_email}?{params}": {
+    "/data/{user_email}": {
       "get": {
         "operationId": "getScheduleByEmail",
         "summary": "Fetch and filter user schedule data",
