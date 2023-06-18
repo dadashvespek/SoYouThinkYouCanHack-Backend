@@ -195,7 +195,9 @@ function filterData(data, start_datetime, end_datetime) {
   });
   console.log(`starttime: ${start}`);
   console.log(`endtime: ${end}`);
-  console.log(`filteredData: ${filteredData}`);
+  console.log(`filteredData: ${JSON.stringify(filteredData)}`);
+  // console.log(JSON.stringify(data, null, 2));
+
   return filteredData;
 }
 
