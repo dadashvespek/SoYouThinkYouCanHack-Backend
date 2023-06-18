@@ -22,9 +22,17 @@ function getWeekBoundaries(weekOffset) {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + weekOffset * DAYS_IN_WEEK);
   const currentDayOfWeek = currentDate.getDay();
-  
-  const startOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)));
-  const endOfWeek = new Date(currentDate.setDate(currentDate.getDate() - currentDayOfWeek + DAYS_IN_WEEK));
+
+  const startOfWeek = new Date(
+    currentDate.setDate(
+      currentDate.getDate() -
+        currentDayOfWeek +
+        (currentDayOfWeek === 0 ? -6 : 1)
+    )
+  );
+  const endOfWeek = new Date(
+    currentDate.setDate(currentDate.getDate() - currentDayOfWeek + DAYS_IN_WEEK)
+  );
 
   return { startOfWeek, endOfWeek };
 }
@@ -47,14 +55,12 @@ function createBlocks(entry) {
       location: entry.location,
     });
   }
-  
+
   return blocks;
 }
 
 app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
-
   const { user_id, weekOffset = 0 } = req.params;
-  
 
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + weekOffset * 7); // Apply week offset
@@ -62,7 +68,9 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
   // Calculate start (Monday) and end (Sunday) of the week
   const startOfWeek = new Date(currentDate);
-  startOfWeek.setDate(startOfWeek.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1));
+  startOfWeek.setDate(
+    startOfWeek.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)
+  );
 
   const endOfWeek = new Date(currentDate);
   endOfWeek.setDate(endOfWeek.getDate() - currentDayOfWeek + 7);
@@ -73,7 +81,9 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
     .eq("user_id", user_id);
 
   if (error) {
-    return res.status(500).json({ error: "Failed to fetch data from Supabase" });
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch data from Supabase" });
   }
 
   if (!data) {
@@ -82,9 +92,17 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
 
   const weekData = data.filter((entry) => {
     const startDateTime = new Date(entry.start_datetime);
-    const isEverydayOrEveryweek = ["Everyday", "Everyweek"].includes(entry.repeating);
-    console.log(isEverydayOrEveryweek || (startDateTime >= startOfWeek && startDateTime <= endOfWeek))
-    return isEverydayOrEveryweek || (startDateTime >= startOfWeek && startDateTime <= endOfWeek);
+    const isEverydayOrEveryweek = ["Everyday", "Everyweek"].includes(
+      entry.repeating
+    );
+    console.log(
+      isEverydayOrEveryweek ||
+        (startDateTime >= startOfWeek && startDateTime <= endOfWeek)
+    );
+    return (
+      isEverydayOrEveryweek ||
+      (startDateTime >= startOfWeek && startDateTime <= endOfWeek)
+    );
   });
 
   const transformedData = {
@@ -95,8 +113,17 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
       const startDateTime = new Date(entry.start_datetime);
 
       if (entry.repeating === "Everyday") {
-        return Array(DAYS_IN_WEEK).fill().map((_, dayOfWeek) => blocks.map(block => ({ ...block, dayOfWeek }))).flat();
-      } else if (entry.repeating === "Everyweek" && startDateTime.getDay() >= startOfWeek.getDay() && startDateTime.getDay() <= endOfWeek.getDay()) {
+        return Array(DAYS_IN_WEEK)
+          .fill()
+          .map((_, dayOfWeek) =>
+            blocks.map((block) => ({ ...block, dayOfWeek }))
+          )
+          .flat();
+      } else if (
+        entry.repeating === "Everyweek" &&
+        startDateTime.getDay() >= startOfWeek.getDay() &&
+        startDateTime.getDay() <= endOfWeek.getDay()
+      ) {
         return blocks;
       } else {
         return blocks;
@@ -107,40 +134,41 @@ app.route("/schedule/:user_id/:weekOffset?").get(async (req, res) => {
   res.render("schedule", transformedData);
 });
 
-
 app.get("/data/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
   const { start_datetime, end_datetime } = req.query;
-  console.log(`start_datetime: ${start_datetime}`)
-  console.log(`end_datetime: ${end_datetime}`)
-
+  console.log(`start_datetime: ${start_datetime}`);
+  console.log(`end_datetime: ${end_datetime}`);
 
   // Build the query
-  let query = supabase
-  .from("schedules")
-  .select("*")
-  .eq("user_id", user_id);
+  let query = supabase.from("schedules").select("*").eq("user_id", user_id);
 
-// Fetch the data from Supabase
-let { data, error } = await query;
+  // Fetch the data from Supabase
+  let { data, error } = await query;
 
-if (error) {
-  res.status(500).json({ error: "Failed to fetch data from Supabase" });
-  return;
-}
+  if (error) {
+    res.status(500).json({ error: "Failed to fetch data from Supabase" });
+    return;
+  }
 
-if (!data) {
-  res.json({});
-  return;
-}
+  if (!data) {
+    res.json({ message: "No events data found for this user" });
+    return;
+  }
 
-  console.log(`filterData: ${filterData(data, start_datetime, end_datetime)}`)
+  console.log(`data: ${data}`);
+
+  // console.log(`filterData: ${filterData(data, start_datetime, end_datetime)}`);
   const filteredData = filterData(data, start_datetime, end_datetime);
-  const consolidatedData = consolidateData(filteredData, start_datetime, end_datetime);
+  const consolidatedData = consolidateData(
+    filteredData,
+    start_datetime,
+    end_datetime
+  );
   const result = formatResult(consolidatedData);
-  console.log(`result: ${result}`)
+  // console.log(`result: ${result}`);
   if (result === "" || result === undefined || result === null) {
-    res.send(`Nothing on schedule for user:${user_id}}`)
+    res.send(`Nothing on schedule for user:${user_id}}`);
     return;
   }
 
@@ -154,15 +182,18 @@ function filterData(data, start_datetime, end_datetime) {
     const datetimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
     let startDateTime = new Date(entry.start_datetime);
     let endDateTime = new Date(entry.end_datetime);
-    
-    console.log(`start_datetime from open assistant:${start_datetime}`)
-    console.log(`end_datetime from open assistant:${end_datetime}`)
 
-    console.log(`database schedule event ${entry.event_name} startDateTime:${startDateTime}`)
-    console.log(`database schedule event ${entry.event_name} endDateTime:${endDateTime}`)
-    console.log(`currentDateTime:${currentDateTime}`)
-    console.log(`currentDate:${currentDate}`)
+    console.log(`start_datetime from open assistant:${start_datetime}`);
+    console.log(`end_datetime from open assistant:${end_datetime}`);
 
+    console.log(
+      `database schedule event ${entry.event_name} startDateTime:${startDateTime}`
+    );
+    console.log(
+      `database schedule event ${entry.event_name} endDateTime:${endDateTime}`
+    );
+    console.log(`currentDateTime:${currentDateTime}`);
+    console.log(`currentDate:${currentDate}`);
 
     if (entry.repeating === "Everyday") {
       return true;
@@ -175,62 +206,74 @@ function filterData(data, start_datetime, end_datetime) {
       const windowStartWeekday = windowStart.getUTCDay();
       const windowEndWeekday = windowEnd.getUTCDay();
       // If the event's start weekday is within the range, include it
-      if (windowStartWeekday <= startWeekday && startWeekday <= windowEndWeekday) {
+      if (
+        windowStartWeekday <= startWeekday &&
+        startWeekday <= windowEndWeekday
+      ) {
         return true;
       }
     }
 
     if (start_datetime && !datetimeRegex.test(start_datetime)) {
-      if (start_datetime.length == 10) { // This means it's a date without time
+      if (start_datetime.length == 10) {
+        // This means it's a date without time
         startDateTime = new Date(`${start_datetime}T00:00:00`);
-      } else { // This means it's a time without date
+      } else {
+        // This means it's a time without date
         startDateTime = new Date(`${currentDate}T${start_datetime}`);
       }
     }
     if (end_datetime && !datetimeRegex.test(end_datetime)) {
-      if (end_datetime.length == 10) { // This means it's a date without time
+      if (end_datetime.length == 10) {
+        // This means it's a date without time
         endDateTime = new Date(`${end_datetime}T23:59:59`);
-      } else { // This means it's a time without date
+      } else {
+        // This means it's a time without date
         endDateTime = new Date(`${currentDate}T${end_datetime}`);
       }
     }
-    
 
     if (start_datetime && end_datetime) {
       const windowStart = new Date(start_datetime);
       const windowEnd = new Date(end_datetime);
-      console.log(`there is a start_datetime and end_datetime`)
-      console.log(`windowStart: ${windowStart}`)
-      console.log(`windowEnd: ${windowEnd}`)
+      console.log(`there is a start_datetime and end_datetime`);
+      console.log(`windowStart: ${windowStart}`);
+      console.log(`windowEnd: ${windowEnd}`);
       if (!(endDateTime >= windowStart && startDateTime <= windowEnd)) {
-      
-        console.log(`is startDateTime after windowStart: ${startDateTime >= windowStart}`)
-        console.log(`is endDateTime before windowEnd: ${endDateTime <= windowEnd}`)
-        
+        console.log(
+          `is startDateTime after windowStart: ${startDateTime >= windowStart}`
+        );
+        console.log(
+          `is endDateTime before windowEnd: ${endDateTime <= windowEnd}`
+        );
+
         return false;
       }
     } else if (start_datetime) {
-      console.log(`there is only a start_datetime`)
-      console.log(`start_datetime: ${start_datetime}`)
+      console.log(`there is only a start_datetime`);
+      console.log(`start_datetime: ${start_datetime}`);
 
       const windowStart = new Date(start_datetime);
       if (!(startDateTime >= windowStart)) {
-        console.log(`startDateTime: ${startDateTime} is not greater than windowStart: ${windowStart}`)
-        console.log(`start_datetime: ${start_datetime}`)
+        console.log(
+          `startDateTime: ${startDateTime} is not greater than windowStart: ${windowStart}`
+        );
+        console.log(`start_datetime: ${start_datetime}`);
         return false;
       }
     } else if (end_datetime) {
-      console.log(`there is only a end_datetime`)
+      console.log(`there is only a end_datetime`);
       const windowEnd = new Date(end_datetime);
       if (!(endDateTime <= windowEnd)) {
-        console.log(`endDateTime: ${endDateTime} is not less than windowEnd: ${windowEnd}`)
+        console.log(
+          `endDateTime: ${endDateTime} is not less than windowEnd: ${windowEnd}`
+        );
         return false;
       }
     }
     return true;
   });
 }
-
 
 function consolidateData(data, start_datetime, end_datetime) {
   const windowStart = start_datetime ? new Date(start_datetime) : null;
@@ -241,40 +284,40 @@ function consolidateData(data, start_datetime, end_datetime) {
     const startDateTime = new Date(entry.start_datetime);
     const endDateTime = new Date(entry.end_datetime);
 
-        if (entry.repeating === 'Everyweek') {
-            while (startDateTime < windowStart) {
-                startDateTime.setDate(startDateTime.getDate() + 7);
-                endDateTime.setDate(endDateTime.getDate() + 7);
-            }
-            while (startDateTime > windowEnd) {
-                startDateTime.setDate(startDateTime.getDate() - 7);
-                endDateTime.setDate(endDateTime.getDate() - 7);
-            }
+    if (entry.repeating === "Everyweek") {
+      while (startDateTime < windowStart) {
+        startDateTime.setDate(startDateTime.getDate() + 7);
+        endDateTime.setDate(endDateTime.getDate() + 7);
+      }
+      while (startDateTime > windowEnd) {
+        startDateTime.setDate(startDateTime.getDate() - 7);
+        endDateTime.setDate(endDateTime.getDate() - 7);
+      }
+    }
+
+    if (entry.repeating === "Everyday") {
+      const dateCursor = new Date(windowStart);
+
+      while (dateCursor <= windowEnd) {
+        const date = dateCursor.toISOString().split("T")[0]; // Get date in YYYY-MM-DD format
+        if (!consolidatedData[date]) {
+          consolidatedData[date] = [];
         }
 
-        if (entry.repeating === 'Everyday') {
-            const dateCursor = new Date(windowStart);
+        consolidatedData[date].push({
+          startTime: startDateTime.getHours(),
+          endTime: endDateTime.getHours(),
+          eventName: entry.event_name,
+          location: entry.location,
+        });
 
-            while (dateCursor <= windowEnd) {
-                const date = dateCursor.toISOString().split('T')[0]; // Get date in YYYY-MM-DD format
-                if (!consolidatedData[date]) {
-                    consolidatedData[date] = [];
-                }
-                
-                consolidatedData[date].push({
-                    startTime: startDateTime.getHours(),
-                    endTime: endDateTime.getHours(),
-                    eventName: entry.event_name,
-                    location: entry.location,
-                });
+        // Advance to next day
+        dateCursor.setDate(dateCursor.getDate() + 1);
+      }
 
-                // Advance to next day
-                dateCursor.setDate(dateCursor.getDate() + 1);
-            }
-
-            // Skip the usual event addition logic for 'Everyday' events
-            return;
-        }
+      // Skip the usual event addition logic for 'Everyday' events
+      return;
+    }
 
     const date = startDateTime.toISOString().split("T")[0];
     const startTime = startDateTime.getHours();
@@ -298,7 +341,9 @@ function consolidateData(data, start_datetime, end_datetime) {
 function formatResult(consolidatedData) {
   return Object.entries(consolidatedData).map(([date, events]) => {
     const eventSummaries = events.map((event) => {
-      return `${event.startTime}-${event.endTime}: ${event.eventName} ${event.location? "at" + event.location : ''}`;
+      return `${event.startTime}-${event.endTime}: ${event.eventName} ${
+        event.location ? "at" + event.location : ""
+      }`;
     });
     return `${date}: ${eventSummaries.join(", ")}`;
   });
@@ -306,37 +351,34 @@ function formatResult(consolidatedData) {
 
 // Register a new user
 app.post("/api/users", async (req, res) => {
-const { user_id, name, email, password } = req.body;
-const { data, error } = await supabase
-  .from("users")
-  .insert([{ user_id, name, email, password }]);
+  const { user_id, name, email, password } = req.body;
+  const { data, error } = await supabase
+    .from("users")
+    .insert([{ user_id, name, email, password }]);
 
-if (error) return res.status(500).json({ error: error.message });
-return res.status(200).json(data);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json(data);
 });
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
-const { user_id } = req.params;
-const { event_name, location, start_datetime, end_datetime, repeating } =
-  req.body;
-const { data, error } = await supabase.from("schedules").insert([
-  {
-    user_id,
-    event_name,
-    location,
-    start_datetime,
-    end_datetime,
-    repeating,
-  },
-]);
+  const { user_id } = req.params;
+  const { event_name, location, start_datetime, end_datetime, repeating } =
+    req.body;
+  const { data, error } = await supabase.from("schedules").insert([
+    {
+      user_id,
+      event_name,
+      location,
+      start_datetime,
+      end_datetime,
+      repeating,
+    },
+  ]);
 
-if (error) return res.status(500).json({ error: error.message });
-return res.status(200).json(data);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json(data);
 });
-
-
-
 
 // Create a new event for a specific user
 app.post("/api/users/:user_id/schedules", async (req, res) => {
@@ -355,13 +397,11 @@ app.post("/api/users/:user_id/schedules", async (req, res) => {
       },
     ]);
     if (error) throw error;
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Event '${event_name}' was created successfully for user ${user_id}.`,
-        event: data,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Event '${event_name}' was created successfully for user ${user_id}.`,
+      event: data,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -377,9 +417,8 @@ app.post("/savetosupabase", async (req, res) => {
       return;
     }
 
-
     // Prepare data for insert operation
-    const insertData = events.map(event => ({
+    const insertData = events.map((event) => ({
       user_id: user_id,
       event_name: event.event_name,
       location: event.location,
@@ -388,12 +427,12 @@ app.post("/savetosupabase", async (req, res) => {
     }));
 
     const { data, error } = await supabase.from("schedules").insert(insertData);
-    
+
     if (error) throw error;
 
     console.log(`Events were created successfully for user ${user_id}.`);
     console.log(`data: ${data}`);
-      
+
     res.status(200).json({
       success: true,
       message: `Events were created successfully for user ${user_id}.`,
@@ -404,7 +443,6 @@ app.post("/savetosupabase", async (req, res) => {
   }
 });
 
-
 // Retrieve all events for a specific user
 app.get("/api/users/:user_id/schedules", async (req, res) => {
   try {
@@ -414,13 +452,11 @@ app.get("/api/users/:user_id/schedules", async (req, res) => {
       .select("*")
       .eq("user_id", user_id);
     if (error) throw error;
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Retrieved all events for user ${user_id}.`,
-        events: data,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Retrieved all events for user ${user_id}.`,
+      events: data,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -448,13 +484,11 @@ app.put("/api/users/:user_id/schedules", async (req, res) => {
       .eq("start_datetime", old_start_datetime)
       .eq("end_datetime", old_end_datetime);
     if (error) throw error;
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Event '${old_event_name}' for user ${user_id} was updated successfully.`,
-        event: data,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Event '${old_event_name}' for user ${user_id} was updated successfully.`,
+      event: data,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -473,13 +507,11 @@ app.delete("/api/users/:user_id/schedules", async (req, res) => {
       .eq("start_datetime", start_datetime)
       .eq("end_datetime", end_datetime);
     if (error) throw error;
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Event '${event_name}' for user ${user_id} was deleted successfully.`,
-        event: data,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Event '${event_name}' for user ${user_id} was deleted successfully.`,
+      event: data,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
